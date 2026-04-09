@@ -42,6 +42,7 @@ build/
 tmp/
 logs/
 runtime/
+_site/
 
 # Generated demo outputs (re-created by soulkiller-demo)
 demo/generated/
