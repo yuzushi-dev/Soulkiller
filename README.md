@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://yuzushi-dev.github.io/Soulkiller/" target="_blank" rel="noopener noreferrer">→ Live demo</a>
+  <a href="https://yuzushi-dev.github.io/Soulkiller/" target="_blank" rel="noopener noreferrer">Live demo</a>
 </p>
 
 <p align="center">
