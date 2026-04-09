@@ -1,0 +1,319 @@
+{
+  "subject_name": "Demo Subject",
+  "subject_id": "demo-subject",
+  "portrait_summary": "Demo Subject operates with a strong internal compass and a calibrated sense of deliberateness. They gather information extensively before committing, prefer to resolve problems independently through the first phase, and maintain a long planning horizon even under short-term pressure. Relational trust forms slowly but holds firmly once established. A recurring tension exists between their high autonomy drive and the collaborative demands of the contexts they inhabit.",
+  "top_traits": [
+    "deliberate decision-making",
+    "high autonomy preference",
+    "systematic information gathering",
+    "slow but durable trust formation",
+    "regulated stress response"
+  ],
+  "goals": [
+    "maintain sustainable work rhythms without sacrificing quality",
+    "improve relational consistency — particularly in difficult conversations",
+    "reduce the gap between decision quality and decision speed under pressure"
+  ],
+  "facets": [
+    {
+      "id": "cognitive.decision_speed",
+      "category": "cognitive",
+      "name": "decision_speed",
+      "low_label": "impulsive",
+      "high_label": "deliberate",
+      "position": 0.79,
+      "confidence": 0.84,
+      "observation_count": 14
+    },
+    {
+      "id": "cognitive.information_gathering",
+      "category": "cognitive",
+      "name": "information_gathering",
+      "low_label": "narrow",
+      "high_label": "exhaustive",
+      "position": 0.82,
+      "confidence": 0.77,
+      "observation_count": 11
+    },
+    {
+      "id": "cognitive.analytical_approach",
+      "category": "cognitive",
+      "name": "analytical_approach",
+      "low_label": "intuitive",
+      "high_label": "systematic",
+      "position": 0.74,
+      "confidence": 0.71,
+      "observation_count": 9
+    },
+    {
+      "id": "cognitive.risk_tolerance",
+      "category": "cognitive",
+      "name": "risk_tolerance",
+      "low_label": "risk-averse",
+      "high_label": "risk-seeking",
+      "position": 0.35,
+      "confidence": 0.58,
+      "observation_count": 6
+    },
+    {
+      "id": "emotional.stress_response",
+      "category": "emotional",
+      "name": "stress_response",
+      "low_label": "reactive",
+      "high_label": "regulated",
+      "position": 0.71,
+      "confidence": 0.73,
+      "observation_count": 10
+    },
+    {
+      "id": "emotional.resilience_pattern",
+      "category": "emotional",
+      "name": "resilience_pattern",
+      "low_label": "fragile",
+      "high_label": "resilient",
+      "position": 0.67,
+      "confidence": 0.62,
+      "observation_count": 7
+    },
+    {
+      "id": "emotional.frustration_triggers",
+      "category": "emotional",
+      "name": "frustration_triggers",
+      "low_label": "high-threshold",
+      "high_label": "low-threshold",
+      "position": 0.44,
+      "confidence": 0.55,
+      "observation_count": 5
+    },
+    {
+      "id": "emotional.distress_tolerance",
+      "category": "emotional",
+      "name": "distress_tolerance",
+      "low_label": "low",
+      "high_label": "high",
+      "position": 0.63,
+      "confidence": 0.60,
+      "observation_count": 6
+    },
+    {
+      "id": "communication.verbosity",
+      "category": "communication",
+      "name": "verbosity",
+      "low_label": "terse",
+      "high_label": "expansive",
+      "position": 0.28,
+      "confidence": 0.80,
+      "observation_count": 13
+    },
+    {
+      "id": "communication.directness",
+      "category": "communication",
+      "name": "directness",
+      "low_label": "indirect",
+      "high_label": "direct",
+      "position": 0.81,
+      "confidence": 0.79,
+      "observation_count": 12
+    },
+    {
+      "id": "communication.conflict_style",
+      "category": "communication",
+      "name": "conflict_style",
+      "low_label": "avoidant",
+      "high_label": "confrontational",
+      "position": 0.52,
+      "confidence": 0.47,
+      "observation_count": 4
+    },
+    {
+      "id": "communication.feedback_preference",
+      "category": "communication",
+      "name": "feedback_preference",
+      "low_label": "diplomatic",
+      "high_label": "direct",
+      "position": 0.83,
+      "confidence": 0.76,
+      "observation_count": 8
+    },
+    {
+      "id": "relational.help_seeking",
+      "category": "relational",
+      "name": "help_seeking",
+      "low_label": "independent",
+      "high_label": "collaborative",
+      "position": 0.22,
+      "confidence": 0.82,
+      "observation_count": 13
+    },
+    {
+      "id": "relational.trust_formation",
+      "category": "relational",
+      "name": "trust_formation",
+      "low_label": "slow",
+      "high_label": "fast",
+      "position": 0.24,
+      "confidence": 0.75,
+      "observation_count": 9
+    },
+    {
+      "id": "relational.boundary_style",
+      "category": "relational",
+      "name": "boundary_style",
+      "low_label": "porous",
+      "high_label": "firm",
+      "position": 0.69,
+      "confidence": 0.64,
+      "observation_count": 7
+    },
+    {
+      "id": "relational.social_energy",
+      "category": "relational",
+      "name": "social_energy",
+      "low_label": "draining",
+      "high_label": "energizing",
+      "position": 0.38,
+      "confidence": 0.50,
+      "observation_count": 4
+    },
+    {
+      "id": "values.autonomy_drive",
+      "category": "values",
+      "name": "autonomy_drive",
+      "low_label": "low",
+      "high_label": "high",
+      "position": 0.85,
+      "confidence": 0.88,
+      "observation_count": 16
+    },
+    {
+      "id": "values.work_ethic",
+      "category": "values",
+      "name": "work_ethic",
+      "low_label": "minimal",
+      "high_label": "maximal",
+      "position": 0.76,
+      "confidence": 0.72,
+      "observation_count": 10
+    },
+    {
+      "id": "values.fairness_sensitivity",
+      "category": "values",
+      "name": "fairness_sensitivity",
+      "low_label": "low",
+      "high_label": "high",
+      "position": 0.58,
+      "confidence": 0.44,
+      "observation_count": 4
+    },
+    {
+      "id": "temporal.planning_horizon",
+      "category": "temporal",
+      "name": "planning_horizon",
+      "low_label": "reactive",
+      "high_label": "long-term",
+      "position": 0.80,
+      "confidence": 0.78,
+      "observation_count": 10
+    },
+    {
+      "id": "temporal.routine_attachment",
+      "category": "temporal",
+      "name": "routine_attachment",
+      "low_label": "fluid",
+      "high_label": "structured",
+      "position": 0.66,
+      "confidence": 0.61,
+      "observation_count": 6
+    },
+    {
+      "id": "temporal.deadline_behavior",
+      "category": "temporal",
+      "name": "deadline_behavior",
+      "low_label": "last-minute",
+      "high_label": "ahead",
+      "position": 0.72,
+      "confidence": 0.68,
+      "observation_count": 8
+    },
+    {
+      "id": "meta_cognition.self_awareness",
+      "category": "meta_cognition",
+      "name": "self_awareness",
+      "low_label": "low",
+      "high_label": "high",
+      "position": 0.77,
+      "confidence": 0.70,
+      "observation_count": 9
+    },
+    {
+      "id": "meta_cognition.cognitive_biases",
+      "category": "meta_cognition",
+      "name": "cognitive_biases",
+      "low_label": "unexamined",
+      "high_label": "examined",
+      "position": 0.62,
+      "confidence": 0.52,
+      "observation_count": 5
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "h-001",
+      "title": "Autonomy–Isolation Risk",
+      "body": "High autonomy drive (0.85) combined with strongly independent help-seeking (0.22) may create productive blind spots: the subject solves problems alone past the point where external input would accelerate or correct the path. The pattern is efficient in familiar domains; it becomes a liability in novel territory where the subject lacks reference points.",
+      "facets": ["values.autonomy_drive", "relational.help_seeking"],
+      "confidence": 0.74
+    },
+    {
+      "id": "h-002",
+      "title": "Deliberateness as Cost Controller",
+      "body": "Exhaustive information gathering (0.82) paired with slow decision-making (0.79) appears to function as a downstream error-reduction strategy rather than pure indecisiveness. The subject seems to front-load cognitive cost to reduce correction cycles. Cost: speed. Benefit: consistency and output quality.",
+      "facets": ["cognitive.information_gathering", "cognitive.decision_speed", "values.work_ethic"],
+      "confidence": 0.68
+    },
+    {
+      "id": "h-003",
+      "title": "Conflict Ambiguity",
+      "body": "Conflict style sits near center (0.52, confidence 0.47 — low). The subject shows direct communication and firm boundaries but also some avoidance of interpersonal confrontation (demo-015). This facet requires more signal before a stable position can be modeled. The low confidence score is correct.",
+      "facets": ["communication.conflict_style", "communication.directness", "relational.boundary_style"],
+      "confidence": 0.47
+    }
+  ],
+  "observations_sample": [
+    {
+      "message_id": "demo-001",
+      "facet_id": "relational.help_seeking",
+      "signal_strength": 0.78,
+      "direction": "independent",
+      "note": "Resolved problem independently before seeking help; framed asking as a fallback, not a first step."
+    },
+    {
+      "message_id": "demo-002",
+      "facet_id": "cognitive.decision_speed",
+      "signal_strength": 0.82,
+      "direction": "deliberate",
+      "note": "Explicit statement of preference for slow, considered decision-making over speed."
+    },
+    {
+      "message_id": "demo-004",
+      "facet_id": "emotional.stress_response",
+      "signal_strength": 0.71,
+      "direction": "regulated",
+      "note": "Describes a concrete regulation technique (externalize, list, reset) applied under cognitive load."
+    },
+    {
+      "message_id": "demo-010",
+      "facet_id": "cognitive.information_gathering",
+      "signal_strength": 0.80,
+      "direction": "exhaustive",
+      "note": "Full documentation read before code — explicit preference for front-loaded information gathering."
+    },
+    {
+      "message_id": "demo-014",
+      "facet_id": "communication.feedback_preference",
+      "signal_strength": 0.83,
+      "direction": "direct",
+      "note": "Explicit statement: prefers direct feedback over diplomatic softening. Frames directness as functional."
+    }
+  ]
+}

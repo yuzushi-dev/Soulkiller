@@ -1,0 +1,53 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.env
+.venv/
+venv/
+
+*.db
+*.sqlite
+*.sqlite3
+*.jsonl
+
+biofeedback_creds.json
+biofeedback.credentials.json
+budget-bridge-state.json
+pending-checkin.json
+delivery.jsonl
+inbox.jsonl
+
+# Secrets e credenziali
+.env.local
+.env.*.local
+secrets/
+creds/
+
+# Session logs agenti
+agents/*/sessions/
+agents/*/sessions/*.jsonl
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+
+dist/
+build/
+*.egg-info/
+
+tmp/
+logs/
+runtime/
+
+# Generated demo outputs (re-created by soulkiller-demo)
+demo/generated/
+
+# Internal and non-essential documents (not needed to spin up or use the project)
+docs/SANITIZATION_STATUS.md
+docs/history/
+docs/whitepaper/
+docs/design/

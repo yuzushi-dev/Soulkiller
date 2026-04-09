@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulkiller · Secure Your Soul · Arasaka Corp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── Design tokens — Arasaka / neomilitarist control deck ── */
+    :root {
+      --background:    #070709;
+      --surface:       #0f0b0d;
+      --surface-2:     #120d10;
+      --card:          #151012;
+      --card-border:   #3c2226;
+      --card-border-2: #5f2f35;
+      --input:         #1b1316;
+      --muted:         #22181b;
+      --muted-fg:      #8f8181;
+      --foreground:    #f3ece8;
+      --foreground-2:  #c9beb8;
+      --accent:        #d72638;
+      --accent-dark:   #8f1624;
+      --accent-soft:   #ff5a6b;
+      --accent-glow:   #d7263830;
+      --accent-muted:  #2a0d11;
+      --accent-fg:     #ffd7db;
+      --success:       #84d1a4;
+      --success-muted: #122419;
+      --warn:          #c6a667;
+      --warn-muted:    #2b2416;
+      --danger:        #ff6b78;
+      --danger-muted:  #391116;
+      --blue:          #8aa0b7;
+      --blue-muted:    #17202a;
+      --purple:        #b5948f;
+      --border-radius: 4px;
+      --radius-sm:     4px;
+      --radius-lg:     8px;
+      --shadow:        0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
+      --font: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+      --font-head: 'Rajdhani', 'IBM Plex Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 160px),
+        radial-gradient(circle at top right, rgba(215,38,56,.14), transparent 28%),
+        linear-gradient(90deg, rgba(198,166,103,.05), transparent 26%, transparent 74%, rgba(198,166,103,.04));
+      letter-spacing: .01em;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 100% 4px;
+      opacity: .14;
+      mix-blend-mode: soft-light;
+    }
+
+    body::after {
+      content: 'SECURE YOUR SOUL';
+      position: fixed;
+      bottom: 28px;
+      right: 32px;
+      pointer-events: none;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: rgba(215,38,56,.09);
+      text-transform: uppercase;
+      z-index: 0;
+    }
+
+    .frame-border {
+      position: fixed;
+      inset: 14px;
+      pointer-events: none;
+      border: 1px solid rgba(198,166,103,.12);
+      box-shadow: inset 0 0 0 1px rgba(215,38,56,.07);
+      z-index: 9999;
+    }
+
+    /* ── Layout ── */
+    .layout { display: flex; height: 100dvh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 248px;
+      flex-shrink: 0;
+      background:
+        linear-gradient(180deg, rgba(215,38,56,.08), transparent 120px),
+        linear-gradient(180deg, var(--surface), var(--surface-2));
+      border-right: 1px solid var(--card-border-2);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 0 0 16px;
+      box-shadow: inset -1px 0 0 rgba(198,166,103,.08);
+    }
+    .sidebar-header {
+      padding: 22px 18px 14px;
+      border-bottom: 1px solid var(--card-border-2);
+      position: relative;
+    }
+    .sidebar-header::after {
+      content: '荒坂 CORP · CLASSIFIED';
+      position: absolute;
+      right: 18px;
+      top: 10px;
+      font-size: 10px;
+      letter-spacing: .18em;
+      color: rgba(198,166,103,.85);
+      font-family: var(--font-mono);
+    }
+    .sidebar-logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--foreground);
+      font-family: var(--font-head);
+      text-transform: uppercase;
+    }
+    .sidebar-logo span { color: var(--accent-soft); }
+    .sidebar-sub {
+      font-size: 11px;
+      color: var(--muted-fg);
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .nav { padding: 8px; flex: 1; }
+    .nav-group { margin-bottom: 4px; }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--warn);
+      padding: 10px 10px 6px;
+      font-family: var(--font-mono);
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-radius: var(--radius-sm);
+      color: var(--foreground-2); cursor: pointer; font-size: 13px;
+      transition: background .12s, color .12s, border-color .12s;
+      border: 1px solid transparent; background: none; width: 100%; text-align: left;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .nav-item:hover { background: rgba(215,38,56,.08); color: var(--foreground); border-color: rgba(215,38,56,.22); }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(215,38,56,.2), rgba(215,38,56,.06));
+      color: var(--accent-fg);
+      font-weight: 600;
+      border-color: var(--accent-dark);
+      box-shadow: inset 2px 0 0 var(--warn);
+    }
+    .nav-item .icon { font-size: 14px; flex-shrink: 0; width: 16px; text-align: center; }
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--card-border);
+      font-size: 11px;
+      color: var(--muted-fg);
+    }
+    .refresh-btn {
+      display: inline-block; margin-top: 6px; color: var(--accent-soft);
+      cursor: pointer; font-size: 11px; background: none; border: none;
+      font-family: var(--font-mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .refresh-btn:hover { color: var(--warn); }
+
+    /* ── Main ── */
+    .main { flex: 1; overflow-y: auto; padding: 28px; }
+    .section {
+      display: none;
+      max-width: 1320px;
+      padding: 22px;
+      border: 1px solid rgba(198,166,103,.1);
+      background: linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .section.active { display: block; }
+    .page-title {
+      font-size: 30px; font-weight: 700; letter-spacing: .1em;
+      margin-bottom: 4px; color: var(--foreground);
+      font-family: var(--font-head);
+      text-transform: uppercase;
+    }
+    .page-sub {
+      font-size: 12px;
+      color: var(--muted-fg);
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* ── Card ── */
+    .card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,0)),
+        var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(198,166,103,.5), transparent);
+      opacity: .7;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--foreground-2);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-family: var(--font-mono);
+    }
+
+    /* ── KPI cards ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: 16px;
+      position: relative;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 64px;
+      height: 2px;
+      background: var(--accent);
+    }
+    .kpi-value { font-size: 31px; font-weight: 700; letter-spacing: .02em; line-height: 1; font-family: var(--font-head); }
+    .kpi-label { font-size: 10px; color: var(--muted-fg); margin-top: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: .16em; font-family: var(--font-mono); }
+    .kpi-accent  { color: var(--accent); }
+    .kpi-success { color: var(--success); }
+    .kpi-warn    { color: var(--warn); }
+    .kpi-danger  { color: var(--danger); }
+    .kpi-muted   { color: var(--foreground-2); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 8px; border-radius: 2px;
+      font-size: 11px; font-weight: 600; line-height: 1.6;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      border: 1px solid transparent;
+    }
+    .badge-accent   { background: var(--accent-muted);  color: var(--accent-fg); border-color: rgba(255,90,107,.3); }
+    .badge-success  { background: var(--success-muted); color: var(--success); border-color: rgba(132,209,164,.25); }
+    .badge-warn     { background: var(--warn-muted);    color: var(--warn); border-color: rgba(198,166,103,.25); }
+    .badge-danger   { background: var(--danger-muted);  color: var(--danger); border-color: rgba(255,107,120,.25); }
+    .badge-muted    { background: var(--muted);         color: var(--muted-fg); border-color: rgba(143,129,129,.2); }
+    .badge-blue     { background: var(--blue-muted);    color: var(--blue); border-color: rgba(138,160,183,.25); }
+    .badge-purple   { background: #26191a;              color: var(--purple); border-color: rgba(181,148,143,.25); }
+
+    /* ── Alert banner ── */
+    .alert {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px; border-radius: var(--border-radius);
+      margin-bottom: 16px; font-size: 13px;
+      box-shadow: inset 2px 0 0 currentColor;
+    }
+    .alert-warn   { background: var(--warn-muted);   border: 1px solid var(--warn);   color: var(--warn); }
+    .alert-danger { background: var(--danger-muted); border: 1px solid var(--danger); color: var(--danger); }
+    .alert-info   { background: var(--accent-muted); border: 1px solid var(--accent); color: var(--accent-fg); }
+    .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 8px 12px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+      color: var(--muted-fg); border-bottom: 1px solid var(--card-border);
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--muted); font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(215,38,56,.06); }
+    .mono { font-family: var(--font-mono); font-size: 12px; }
+
+    /* ── Toggle ── */
+    .toggle-wrap { display: flex; align-items: center; }
+    .toggle {
+      appearance: none; width: 36px; height: 20px;
+      border-radius: 10px; background: var(--muted);
+      cursor: pointer; position: relative; transition: background .15s;
+      flex-shrink: 0;
+    }
+    .toggle:checked { background: var(--accent); }
+    .toggle::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; border-radius: 50%; background: white;
+      transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+    .toggle:checked::after { transform: translateX(16px); }
+
+    /* ── Spectrum bar ── */
+    .spectrum-wrap { margin: 6px 0 4px; }
+    .spectrum-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted-fg); margin-bottom: 4px; }
+    .spectrum-track { height: 6px; border-radius: 3px; background: var(--muted); position: relative; }
+    .spectrum-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #2563eb, #2dd4bf); }
+    .spectrum-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--foreground); border: 2px solid var(--accent);
+      position: absolute; top: -2px; transform: translateX(-50%);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    /* ── Confidence bar ── */
+    .conf-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .conf-bar-track { flex: 1; height: 4px; border-radius: 2px; background: var(--muted); }
+    .conf-bar-fill { height: 100%; border-radius: 2px; }
+
+    /* ── Grid helpers ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .main { padding: 16px; } .sidebar { display: none; } }
+
+    /* ── Facet card ── */
+    .facet-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--border-radius); padding: 14px;
+      transition: border-color .15s;
+    }
+    .facet-card:hover { border-color: var(--accent-dark); }
+    .facet-name { font-size: 13px; font-weight: 600; color: var(--foreground); }
+    .facet-id   { font-size: 11px; color: var(--muted-fg); font-family: var(--font-mono); margin-top: 1px; }
+    .facet-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .facet-no-data { font-size: 12px; color: var(--muted-fg); font-style: italic; margin-top: 10px; }
+
+    /* ── Checkin card ── */
+    .checkin-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--border-radius); padding: 14px; margin-bottom: 10px;
+    }
+    .checkin-q { font-size: 13px; color: var(--foreground-2); line-height: 1.5; }
+    .checkin-q strong { color: var(--muted-fg); font-weight: 500; }
+    .checkin-a { font-size: 13px; color: var(--foreground); margin-top: 8px; line-height: 1.5; }
+    .checkin-a strong { color: var(--muted-fg); font-weight: 500; }
+
+    /* ── Hypothesis card ── */
+    .hyp-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--border-radius); padding: 14px; margin-bottom: 10px;
+    }
+    .hyp-text { font-size: 13px; color: var(--foreground); line-height: 1.6; margin-top: 8px; }
+
+    /* ── Filters ── */
+    .filter-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .filter-btn {
+      padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--card-border);
+      background: var(--card); color: var(--foreground-2); transition: all .12s;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .filter-btn:hover { border-color: var(--accent-dark); color: var(--accent-fg); }
+    .filter-btn.active { background: var(--accent-muted); border-color: var(--accent); color: var(--accent-fg); box-shadow: inset 0 0 0 1px rgba(198,166,103,.18); }
+
+    /* ── Category section ── */
+    .cat-section { margin-bottom: 28px; }
+    .cat-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--accent); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .facets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+
+    /* ── Dot status ── */
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot-ok      { background: var(--success); box-shadow: 0 0 4px var(--success); }
+    .dot-error   { background: var(--danger);  box-shadow: 0 0 4px var(--danger); }
+    .dot-warn    { background: var(--warn);    box-shadow: 0 0 4px var(--warn); }
+    .dot-off     { background: var(--muted-fg); }
+
+    /* ── Memory card ── */
+    .mem-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--border-radius); padding: 14px; margin-bottom: 8px;
+    }
+    .mem-content { font-size: 13px; color: var(--foreground); line-height: 1.6; margin-top: 6px; }
+    .mem-meta { font-size: 11px; color: var(--muted-fg); margin-top: 6px; }
+
+    /* ── Sentiment bar ── */
+    .sent-bar { width: 60px; height: 4px; border-radius: 2px; background: var(--muted); position: relative; display: inline-block; vertical-align: middle; margin-left: 6px; }
+    .sent-fill { height: 100%; border-radius: 2px; position: absolute; }
+
+    /* ── Metrics grid ── */
+    .metric-vals { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 12px; }
+    .metric-val-item { text-align: center; }
+    .metric-val-num { font-size: 18px; font-weight: 700; color: var(--foreground); }
+    .metric-val-key { font-size: 10px; color: var(--muted-fg); margin-top: 3px; text-transform: lowercase; }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 40px 20px; color: var(--muted-fg); }
+    .empty-icon { font-size: 32px; margin-bottom: 8px; }
+    .empty-text { font-size: 13px; }
+    .empty-sub { font-size: 12px; margin-top: 4px; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--card-border); margin: 16px 0; }
+
+    /* ── Charts ── */
+    .chart-wrap { position: relative; height: 180px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; padding: 7px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500; font-family: var(--font);
+      cursor: pointer; border: 1px solid transparent;
+      transition: background .12s, color .12s, border-color .12s;
+      white-space: nowrap;
+    }
+    .btn-primary  { background: var(--accent); color: #0a1a18; border-color: var(--accent); }
+    .btn-primary:hover  { background: var(--accent-dark); border-color: var(--accent-dark); }
+    .btn-danger   { background: var(--danger-muted); color: var(--danger); border-color: var(--danger); }
+    .btn-danger:hover   { background: var(--danger); color: #0a0a0a; }
+    .btn-ghost    { background: transparent; color: var(--foreground-2); border-color: var(--card-border); }
+    .btn-ghost:hover    { background: var(--muted); color: var(--foreground); }
+    .btn-icon     { background: none; border: none; color: var(--muted-fg); padding: 3px 5px;
+                    border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; line-height: 1;
+                    font-family: var(--font); transition: background .12s, color .12s; }
+    .btn-icon:hover     { background: var(--muted); color: var(--foreground); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: 24px;
+      width: min(500px, 92vw); max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    }
+    .modal-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-hdr-title { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+    .modal-ftr {
+      display: flex; align-items: center; margin-top: 24px; gap: 8px;
+      padding-top: 16px; border-top: 1px solid var(--card-border);
+    }
+    .form-field   { margin-bottom: 14px; }
+    .form-label   { font-size: 11px; font-weight: 600; color: var(--muted-fg);
+                    text-transform: uppercase; letter-spacing: .04em;
+                    margin-bottom: 6px; display: block; }
+    .form-input   {
+      width: 100%; background: var(--input); border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm); padding: 8px 10px;
+      color: var(--foreground); font-family: var(--font); font-size: 13px;
+      transition: border-color .12s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+    textarea.form-input { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+    /* ── Mobile toggle ── */
+    .mobile-menu-btn { display: none; }
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: flex; align-items: center; justify-content: center;
+        position: fixed; top: 14px; left: 14px; z-index: 100;
+        background: var(--card); border: 1px solid var(--card-border-2);
+        border-radius: var(--radius-sm); width: 36px; height: 36px;
+        cursor: pointer; color: var(--foreground); font-size: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.4);
+      }
+      .sidebar {
+        position: fixed; left: 0; top: 0; height: 100dvh; z-index: 50;
+        transform: translateX(-100%); transition: transform .22s ease;
+        box-shadow: 4px 0 24px rgba(0,0,0,.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop {
+        display: none; position: fixed; inset: 0; z-index: 40;
+        background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+      }
+      .sidebar-backdrop.open { display: block; }
+      .main { padding: 56px 16px 20px; }
+    }
+    @media (max-width: 480px) {
+      .main { padding: 52px 12px 16px; }
+      .page-title { font-size: 22px; }
+      .kpi-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+  /* ── Splash screen ── */
+  #splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+  #splash.fade-out { opacity: 0; }
+
+  .splash-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 700;
+    letter-spacing: .18em;
+    color: #f3ece8;
+    position: relative;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .splash-title::before,
+  .splash-title::after {
+    content: 'SOULKILLER';
+    position: absolute;
+    inset: 0;
+    opacity: 0.85;
+  }
+  .splash-title::before {
+    color: #d72638;
+    animation: glitch-r 1.6s steps(1) infinite;
+  }
+  .splash-title::after {
+    color: #c6a667;
+    animation: glitch-c 1.6s steps(1) infinite;
+  }
+
+  .splash-tagline {
+    font-family: var(--font-mono);
+    font-size: clamp(.65rem, 2vw, .95rem);
+    letter-spacing: .35em;
+    color: #d72638;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: tag-appear 0.3s ease 0.5s forwards;
+  }
+
+  @keyframes tag-appear {
+    to { opacity: 1; }
+  }
+
+  @keyframes glitch-r {
+    0%,100%  { clip-path: none; transform: none; }
+    8%       { clip-path: inset(12% 0 74% 0); transform: translate(-4px, 0); }
+    16%      { clip-path: inset(55% 0 20% 0); transform: translate(3px,  0); }
+    24%      { clip-path: inset(80% 0  5% 0); transform: translate(-2px, 0); }
+    32%      { clip-path: inset(30% 0 50% 0); transform: translate( 5px, 0); }
+    40%      { clip-path: none; transform: none; }
+    60%      { clip-path: inset(5%  0 88% 0); transform: translate(-3px, 0); }
+    68%      { clip-path: inset(70% 0 15% 0); transform: translate( 4px, 0); }
+    76%      { clip-path: none; transform: none; }
+  }
+
+  @keyframes glitch-c {
+    0%,100%  { clip-path: none; transform: none; }
+    10%      { clip-path: inset(60% 0 25% 0); transform: translate( 4px, 0); }
+    18%      { clip-path: inset(20% 0 65% 0); transform: translate(-3px, 0); }
+    26%      { clip-path: inset(85% 0  5% 0); transform: translate( 2px, 0); }
+    34%      { clip-path: inset(40% 0 45% 0); transform: translate(-5px, 0); }
+    42%      { clip-path: none; transform: none; }
+    62%      { clip-path: inset(10% 0 80% 0); transform: translate( 3px, 0); }
+    70%      { clip-path: inset(75% 0 10% 0); transform: translate(-4px, 0); }
+    78%      { clip-path: none; transform: none; }
+  }
+  </style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-title">SOULKILLER</div>
+  <div class="splash-tagline">Secure your soul</div>
+</div>
+
+<script>
+(function() {
+  var splash = document.getElementById('splash');
+  setTimeout(function() {
+    splash.classList.add('fade-out');
+    setTimeout(function() { splash.remove(); }, 450);
+  }, 2100);
+})();
+</script>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<div class="frame-border"></div>
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Soul<span>killer</span></div>
+      <div class="sidebar-sub">SECURE YOUR SOUL · MIKOSHI PROTOCOL</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group">
+        <div class="nav-label">Control</div>
+        <button class="nav-item active" onclick="show('health', this)">
+          <span class="icon">◈</span> System Health
+        </button>
+        <button class="nav-item" onclick="show('cron', this)">
+          <span class="icon">⏱</span> Scheduler
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Psychometrics</div>
+        <button class="nav-item" onclick="show('profile', this)">
+          <span class="icon">◎</span> Profile
+        </button>
+        <button class="nav-item" onclick="show('hypotheses', this)">
+          <span class="icon">◉</span> Hypotheses
+        </button>
+        <button class="nav-item" onclick="show('fgs', this)">
+          <span class="icon">◐</span> Gap Score
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Memory</div>
+        <button class="nav-item" onclick="show('entities', this)">
+          <span class="icon">◈</span> Entities
+        </button>
+        <button class="nav-item" onclick="show('episodes', this)">
+          <span class="icon">◎</span> Episodes
+        </button>
+        <button class="nav-item" onclick="show('decisions', this)">
+          <span class="icon">◑</span> Decisions
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Signals</div>
+        <button class="nav-item" onclick="show('checkin', this)">
+          <span class="icon">◌</span> Check-ins
+        </button>
+        <button class="nav-item" onclick="show('metrics', this)">
+          <span class="icon">◈</span> Comms Metrics
+        </button>
+        <button class="nav-item" onclick="show('constructs', this)">
+          <span class="icon">◉</span> Deep Constructs
+        </button>
+        <button class="nav-item" onclick="show('biofeedback', this)">
+          <span class="icon">♡</span> Biofeedback
+        </button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:10px;letter-spacing:.14em;color:var(--accent-soft);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px;">SECURE YOUR SOUL</div>
+      <div id="last-refresh">—</div>
+      <button class="refresh-btn" onclick="refresh()">↺ Sync</button>
+      <div style="margin-top:10px;font-size:9px;letter-spacing:.1em;color:rgba(198,166,103,.4);font-family:var(--font-mono);">荒坂 · ENGRAMMATIC TRANSFER SYSTEM<br>UNAUTHORIZED ACCESS IS A CAPITAL OFFENSE</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- HEALTH -->
+    <section id="s-health" class="section active">
+      <h1 class="page-title">System Health</h1>
+      <p class="page-sub">Engrammatic transfer runtime · live posture</p>
+      <div id="health-kpi" class="kpi-grid"></div>
+      <div id="health-alerts"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Model Confidence</div>
+          <div class="chart-wrap"><canvas id="chart-snapshots"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Observation Sources</div>
+          <div class="chart-wrap"><canvas id="chart-sources"></canvas></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Bootstrap Loop Monitor <span class="badge badge-muted" style="margin-left:6px;vertical-align:middle">last 7 days</span></div>
+        <div id="bootstrap-status"></div>
+      </div>
+    </section>
+
+    <!-- CRON -->
+    <section id="s-cron" class="section">
+      <h1 class="page-title">Cron Jobs</h1>
+      <p class="page-sub">Mikoshi scheduler · extraction pipeline state</p>
+      <div class="filter-row" id="cron-filters">
+        <button class="filter-btn active" onclick="setCronFilter('', this)">All</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="cron-table">
+            <thead><tr>
+              <th>Job</th><th>Schedule</th><th>Last run</th>
+              <th>Status</th><th>Next</th><th>Errors</th><th>Active</th>
+            </tr></thead>
+            <tbody id="cron-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="s-profile" class="section">
+      <h1 class="page-title">Profile</h1>
+      <p class="page-sub">Facet-level engrammatic model · longitudinal capture</p>
+      <div class="filter-row" id="profile-filters"></div>
+      <div id="profile-body"></div>
+    </section>
+
+    <!-- HYPOTHESES -->
+    <section id="s-hypotheses" class="section">
+      <h1 class="page-title">Behavioral Hypotheses</h1>
+      <p class="page-sub">Cross-facet inference · nightly synthesis pass</p>
+      <div id="hypotheses-body"></div>
+    </section>
+
+    <!-- FGS -->
+    <section id="s-fgs" class="section">
+      <h1 class="page-title">Facet Gap Score</h1>
+      <p class="page-sub">Soul map completeness · low-confidence facet targeting</p>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Facet</th><th>Category</th><th>Confidence</th><th>Obs</th><th>Days stale</th><th>Sensitivity</th></tr></thead>
+            <tbody id="fgs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTITIES -->
+    <section id="s-entities" class="section">
+      <h1 class="page-title">Entities</h1>
+      <p class="page-sub">Relational graph · people, places, and concepts in the engram</p>
+      <div class="filter-row" id="entity-filters"></div>
+      <div id="entities-body"></div>
+    </section>
+
+    <!-- EPISODES -->
+    <section id="s-episodes" class="section">
+      <h1 class="page-title">Episodic Memory</h1>
+      <p class="page-sub">Preserved engrams · facts, events, habits, and preferences</p>
+      <div class="filter-row" id="episode-filters"></div>
+      <div id="episodes-body"></div>
+    </section>
+
+    <!-- DECISIONS -->
+    <section id="s-decisions" class="section">
+      <h1 class="page-title">Decisions</h1>
+      <p class="page-sub">Volition record · tracked choices and consistency index</p>
+      <div id="decisions-body"></div>
+    </section>
+
+    <!-- CHECKIN -->
+    <section id="s-checkin" class="section">
+      <h1 class="page-title">Check-in History</h1>
+      <p class="page-sub">Signal acquisition log · last 50 probe exchanges</p>
+      <div id="checkin-body"></div>
+    </section>
+
+    <!-- METRICS -->
+    <section id="s-metrics" class="section">
+      <h1 class="page-title">Communication Metrics</h1>
+      <p class="page-sub">Corpus analysis · signal density and linguistic pattern extraction</p>
+      <div id="metrics-body"></div>
+    </section>
+
+    <!-- CONSTRUCTS -->
+    <section id="s-constructs" class="section">
+      <h1 class="page-title">Deep Constructs</h1>
+      <p class="page-sub">Sub-surface engram layer · implicit drives, stress index, shadow schemas</p>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title">Implicit Motives <span class="badge badge-muted" style="margin-left:4px">McClelland</span></div>
+          <div class="chart-wrap"><canvas id="chart-motives"></canvas></div>
+          <div id="motives-meta" class="mem-meta" style="margin-top:8px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Stress Index</div>
+          <div id="stress-body"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Early Maladaptive Schemas</div>
+        <div id="schemas-body"></div>
+      </div>
+    </section>
+
+    <!-- BIOFEEDBACK -->
+    <section id="s-biofeedback" class="section">
+      <h1 class="page-title">Biofeedback</h1>
+      <p class="page-sub">Wetware interface · physiological signal console</p>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Latest Reading <span id="bio-date" class="badge badge-muted" style="margin-left:4px">—</span></div>
+        <div id="bio-latest"></div>
+      </div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title">HRV RMSSD <span class="badge badge-muted" style="font-size:10px">→ emotional.resilience_pattern</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-hrv"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">RHR <span class="badge badge-muted" style="font-size:10px">allostatic load proxy</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-rhr"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Avg Stress <span class="badge badge-muted" style="font-size:10px">→ temporal.impulsivity_regulation</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-stress"></canvas></div>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title">Deep Sleep % <span class="badge badge-muted" style="font-size:10px">→ emotional.distress_tolerance</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-deep"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">REM % <span class="badge badge-muted" style="font-size:10px">→ emotional.emotion_clarity</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-rem"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sleep Score <span class="badge badge-muted" style="font-size:10px">→ emotional.distress_tolerance</span></div>
+          <div class="chart-wrap" style="height:120px"><canvas id="chart-sleep-score"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Signal history</div>
+        <div id="bio-history"></div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /layout -->
+
+<!-- ── Edit Modal ── -->
+<div id="edit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <span class="modal-hdr-title" id="modal-title">Edit</span>
+      <button class="btn-icon" onclick="closeModal()" style="font-size:16px">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-ftr">
+      <button class="btn btn-danger" id="modal-del-btn">Delete</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+const charts = {};
+let cronFilter = '', profileCatFilter = '', episodeTypeFilter = '', entityTypeFilter = '';
+let episodeCache = [], entityCache = [];
+
+// ── Nav ───────────────────────────────────────────────────────────────────
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  load(id);
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
+  document.body.style.overflow =
+    document.getElementById('sidebar').classList.contains('open') ? 'hidden' : '';
+}
+
+async function get(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+function ts() {
+  document.getElementById('last-refresh').textContent =
+    new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+}
+
+function refresh() {
+  const active = document.querySelector('.section.active');
+  if (active) load(active.id.replace('s-', ''));
+}
+
+// ── Modal helpers ──────────────────────────────────────────────────────────
+function closeModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+async function apiPatch(url, body) {
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ detail: r.status }));
+    throw new Error(err.detail || r.status);
+  }
+  return r.json();
+}
+
+async function apiDelete(url) {
+  const r = await fetch(url, { method: 'DELETE' });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ detail: r.status }));
+    throw new Error(err.detail || r.status);
+  }
+  return r.json();
+}
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function field(label, inputHtml) {
+  return `<div class="form-field"><label class="form-label">${escapeHtml(label)}</label>${inputHtml}</div>`;
+}
+
+function fSelect(id, options, current) {
+  const opts = options.map(o =>
+    `<option value="${escapeHtml(o)}" ${o === current ? 'selected' : ''}>${escapeHtml(o)}</option>`
+  ).join('');
+  return `<select id="${escapeHtml(id)}" class="form-input"><option value="">— nessuno —</option>${opts}</select>`;
+}
+
+function fInput(id, val, placeholder='') {
+  return `<input id="${escapeHtml(id)}" class="form-input" value="${escapeHtml(val)}" placeholder="${escapeHtml(placeholder)}">`;
+}
+
+function fTextarea(id, val) {
+  return `<textarea id="${escapeHtml(id)}" class="form-input">${escapeHtml(val)}</textarea>`;
+}
+
+// ── Entity modal ───────────────────────────────────────────────────────────
+const ENTITY_TYPES = ['person','place','project','activity','organization','object','concept'];
+
+function openEntityModal(id) {
+  const e = entityCache.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('modal-title').textContent = `Entity — ${e.name}`;
+  document.getElementById('modal-body').innerHTML =
+    field('Type',        fSelect('ef-type', ENTITY_TYPES, e.entity_type)) +
+    field('Name',        fInput('ef-name', e.name)) +
+    field('Label',       fInput('ef-label', e.label, 'e.g. colleague, companion, project...')) +
+    field('Description', fTextarea('ef-desc', e.description));
+
+  document.getElementById('modal-save-btn').onclick = async () => {
+    try {
+      await apiPatch(`/api/memory/entities/${id}`, {
+        entity_type: document.getElementById('ef-type').value || null,
+        name:        document.getElementById('ef-name').value.trim() || null,
+        label:       document.getElementById('ef-label').value.trim() || null,
+        description: document.getElementById('ef-desc').value.trim() || null,
+      });
+      closeModal();
+      loadEntities();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('modal-del-btn').onclick = async () => {
+    if (!confirm(`Delete entity "${e.name}"?\nIts relations will also be removed.`)) return;
+    try {
+      await apiDelete(`/api/memory/entities/${id}`);
+      closeModal();
+      loadEntities();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+// ── Episode modal ──────────────────────────────────────────────────────────
+const EPISODE_TYPES = ['fact','event','habit','preference','opinion','emotional_moment',
+  'project_milestone','relationship_update','decision','problem_solving'];
+
+function openEpisodeModal(id) {
+  const e = episodeCache.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('modal-title').textContent = 'Episode';
+  document.getElementById('modal-body').innerHTML =
+    field('Type',             fSelect('epf-type', EPISODE_TYPES, e.episode_type)) +
+    field('Content',          fTextarea('epf-content', e.content)) +
+    field('Confidence (0–1)', fInput('epf-conf', e.confidence, '0.0 – 1.0')) +
+    field('Event date',       fInput('epf-date', e.occurred_at, 'YYYY-MM-DD'));
+
+  document.getElementById('modal-save-btn').onclick = async () => {
+    const conf = parseFloat(document.getElementById('epf-conf').value);
+    if (!isNaN(conf) && (conf < 0 || conf > 1)) { alert('Confidence must be between 0 and 1'); return; }
+    try {
+      await apiPatch(`/api/memory/episodes/${id}`, {
+        episode_type: document.getElementById('epf-type').value || null,
+        content:      document.getElementById('epf-content').value.trim() || null,
+        confidence:   isNaN(conf) ? null : conf,
+        occurred_at:  document.getElementById('epf-date').value.trim() || null,
+      });
+      closeModal();
+      loadEpisodes();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('modal-del-btn').onclick = async () => {
+    if (!confirm('Delete this episode permanently?')) return;
+    try {
+      await apiDelete(`/api/memory/episodes/${id}`);
+      closeModal();
+      loadEpisodes();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+async function deactivateEpisode(id) {
+  if (!confirm('Mark this episode as past/inactive?\nIt will disappear from the list.')) return;
+  try {
+    await apiPatch(`/api/memory/episodes/${id}`, { active: 0 });
+    loadEpisodes();
+  } catch(err) { alert('Error: ' + err.message); }
+}
+
+// ── Decision modal ─────────────────────────────────────────────────────────
+const DECISION_DOMAINS    = ['tech','lifestyle','work','relationships','health','finance','other'];
+const DECISION_DIRECTIONS = ['high','low','neutral'];
+
+function openDecisionModal(id) {
+  const rows = window._decisionsCache || [];
+  const d = rows.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('modal-title').textContent = 'Decision';
+  document.getElementById('modal-body').innerHTML =
+    field('Text',      fTextarea('df-text', d.decision)) +
+    field('Domain',    fSelect('df-domain', DECISION_DOMAINS, d.domain)) +
+    field('Direction', fSelect('df-dir', DECISION_DIRECTIONS, d.direction)) +
+    field('Facet IDs (JSON)', fInput('df-facets', d.facet_ids, '["cognitive.risk_tolerance"]'));
+
+  document.getElementById('modal-save-btn').onclick = async () => {
+    try {
+      await apiPatch(`/api/memory/decisions/${id}`, {
+        decision:  document.getElementById('df-text').value.trim() || null,
+        domain:    document.getElementById('df-domain').value || null,
+        direction: document.getElementById('df-dir').value || null,
+        facet_ids: document.getElementById('df-facets').value.trim() || null,
+      });
+      closeModal();
+      loadDecisions();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('modal-del-btn').onclick = async () => {
+    if (!confirm('Delete this decision?')) return;
+    try {
+      await apiDelete(`/api/memory/decisions/${id}`);
+      closeModal();
+      loadDecisions();
+    } catch(err) { alert('Error: ' + err.message); }
+  };
+
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function load(id) {
+  const map = {
+    health: loadHealth, cron: loadCron, profile: loadProfile,
+    hypotheses: loadHypotheses, fgs: loadFGS, entities: loadEntities,
+    episodes: loadEpisodes, decisions: loadDecisions, checkin: loadCheckin,
+    metrics: loadMetrics, constructs: loadConstructs, biofeedback: loadBiofeedback,
+  };
+  if (map[id]) map[id]();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function confColor(c) {
+  if (c == null) return 'var(--muted-fg)';
+  if (c >= 0.65) return 'var(--success)';
+  if (c >= 0.35) return 'var(--warn)';
+  return 'var(--danger)';
+}
+
+function sensitivityBadge(s) {
+  if (s === 'alta')  return `<span class="badge badge-danger">${s}</span>`;
+  if (s === 'media') return `<span class="badge badge-warn">${s}</span>`;
+  return `<span class="badge badge-muted">${s}</span>`;
+}
+
+function fmtDate(d) { return d ? d.slice(0,10) : '—'; }
+function fmtDateTime(d) { return d ? d.replace('T',' ').slice(0,16) : '—'; }
+
+// ── Health ────────────────────────────────────────────────────────────────
+async function loadHealth() {
+  const [h, obs, snaps] = await Promise.all([
+    get('/api/health'), get('/api/observations/summary'), get('/api/model/snapshots')
+  ]);
+  renderKPI(h);
+  renderAlerts(h, obs);
+  renderSnapshotChart(snaps);
+  renderSourcesChart(obs.by_source_all_time);
+  renderBootstrap(obs);
+  ts();
+}
+
+function renderKPI(h) {
+  const items = [
+    { val: h.total_observations.toLocaleString('it-IT'), label: 'Osservazioni', cls: 'kpi-accent' },
+    { val: h.trait_coverage_pct + '%', label: 'Coverage facet', cls: h.trait_coverage_pct >= 70 ? 'kpi-success' : 'kpi-warn' },
+    { val: (h.avg_confidence * 100).toFixed(1) + '%', label: 'Avg Confidence', cls: h.avg_confidence >= 0.6 ? 'kpi-success' : 'kpi-warn' },
+    { val: h.active_alerts, label: 'Ipotesi attive', cls: h.active_alerts > 0 ? 'kpi-warn' : 'kpi-muted' },
+    { val: h.pending_checkin, label: 'Check-in pending', cls: h.pending_checkin > 0 ? 'kpi-accent' : 'kpi-muted' },
+    { val: h.inbox_unprocessed.toLocaleString('it-IT'), label: 'Inbox unprocessed', cls: h.inbox_unprocessed > 50 ? 'kpi-warn' : 'kpi-muted' },
+  ];
+  document.getElementById('health-kpi').innerHTML = items.map(i => `
+    <div class="kpi-card">
+      <div class="kpi-value ${i.cls}">${i.val}</div>
+      <div class="kpi-label">${i.label}</div>
+    </div>`).join('');
+}
+
+function renderAlerts(h, obs) {
+  const alerts = [];
+  if (obs.bootstrap_loop_risk)
+    alerts.push(`<div class="alert alert-danger"><span class="alert-icon">⚠</span><div><strong>Bootstrap loop risk</strong> — ${obs.session_behavioral_pct_7d}% delle osservazioni negli ultimi 7 giorni provengono da session_behavioral (soglia: 60%). Il sintetizzatore ridurrà il peso automaticamente.</div></div>`);
+  if (h.inbox_unprocessed > 200)
+    alerts.push(`<div class="alert alert-warn"><span class="alert-icon">◉</span><div><strong>${h.inbox_unprocessed.toLocaleString()} messaggi</strong> in inbox non ancora processati dall'extractor.</div></div>`);
+  document.getElementById('health-alerts').innerHTML = alerts.join('');
+}
+
+function renderBootstrap(obs) {
+  const pct = obs.session_behavioral_pct_7d;
+  const risk = obs.bootstrap_loop_risk;
+  const pctInt = Math.min(pct, 100);
+  document.getElementById('bootstrap-status').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:32px;font-weight:700;color:${risk?'var(--danger)':'var(--success)'}">${pct}%</div>
+        <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">session_behavioral ultimi 7 giorni</div>
+      </div>
+      <div style="flex:1;min-width:160px">
+        <div style="height:8px;background:var(--muted);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pctInt}%;background:${risk?'var(--danger)':'var(--accent)'};border-radius:4px;transition:width .3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted-fg);margin-top:4px"><span>0%</span><span>soglia 60%</span><span>100%</span></div>
+      </div>
+      <span class="badge ${risk?'badge-danger':'badge-success'}">${risk?'LOOP RISK':'OK'}</span>
+    </div>`;
+}
+
+function renderSnapshotChart(snaps) {
+  if (!snaps.length) return;
+  const data = [...snaps].reverse();
+  const ctx = document.getElementById('chart-snapshots').getContext('2d');
+  if (charts.snap) charts.snap.destroy();
+  charts.snap = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(s => s.snapshot_at.slice(0,10)),
+      datasets: [
+        { label: 'Avg Confidence %', data: data.map(s => +(s.avg_confidence*100).toFixed(1)),
+          borderColor: '#2dd4bf', backgroundColor: '#2dd4bf15', tension: 0.4, pointRadius: 2, yAxisID:'y' },
+        { label: 'Coverage %', data: data.map(s => +(s.coverage_pct).toFixed(1)),
+          borderColor: '#60a5fa', backgroundColor: '#60a5fa10', tension: 0.4, pointRadius: 2, yAxisID:'y' },
+      ]
+    },
+    options: chartOpts({ yMin: 0, yMax: 100 })
+  });
+}
+
+function renderSourcesChart(sources) {
+  if (!sources.length) return;
+  const ctx = document.getElementById('chart-sources').getContext('2d');
+  if (charts.src) charts.src.destroy();
+  const palette = ['#2dd4bf','#60a5fa','#a78bfa','#f472b6','#fb923c','#4ade80','#facc15','#94a3b8'];
+  charts.src = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: sources.map(s => s.source_type),
+      datasets: [{ data: sources.map(s => s.n), backgroundColor: palette, borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: {
+        legend: { position: 'right', labels: { color: '#71717a', boxWidth: 10, font: { size: 11, family: 'Geist Mono' } } }
+      }
+    }
+  });
+}
+
+function chartOpts({ yMin=0, yMax=100 } = {}) {
+  return {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#71717a', boxWidth: 10, font: { size: 11 } } } },
+    scales: {
+      x: { ticks: { color: '#52525b', maxTicksLimit: 6, font: { size: 10 } }, grid: { color: '#27272a' } },
+      y: { ticks: { color: '#52525b', font: { size: 10 } }, grid: { color: '#27272a' }, min: yMin, max: yMax }
+    }
+  };
+}
+
+// ── Cron ──────────────────────────────────────────────────────────────────
+async function loadCron() {
+  const jobs = await get('/api/cron');
+  window._cronJobs = jobs;
+  const namespaces = [...new Set(jobs.map(j => j.id?.includes(':') ? j.id.split(':')[0] : null).filter(Boolean))].sort();
+  const filterEl = document.getElementById('cron-filters');
+  filterEl.innerHTML = [
+    `<button class="filter-btn active" onclick="setCronFilter('', this)">All</button>`,
+    ...namespaces.map(ns => `<button class="filter-btn" data-ns="${escapeHtml(ns)}" onclick="setCronFilter(this.dataset.ns, this)">${escapeHtml(ns)}</button>`)
+  ].join('');
+  renderCron(jobs);
+  ts();
+}
+
+function setCronFilter(f, btn) {
+  cronFilter = f;
+  document.querySelectorAll('#cron-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (window._cronJobs) renderCron(window._cronJobs);
+}
+
+function renderCron(jobs) {
+  const filtered = cronFilter ? jobs.filter(j => j.id?.includes(cronFilter)) : jobs;
+  document.getElementById('cron-tbody').innerHTML = filtered.map(j => {
+    const s = j.state || {};
+    const lastStatus = s.lastStatus || s.lastRunStatus || '';
+    const ok = j.enabled && lastStatus === 'ok';
+    const err = lastStatus === 'error';
+    const dotCls = !j.enabled ? 'dot-off' : ok ? 'dot-ok' : err ? 'dot-error' : 'dot-warn';
+    const errors = s.consecutiveErrors || 0;
+    const schedExpr = typeof j.schedule === 'string' ? j.schedule : (j.schedule?.expr || '—');
+    return `<tr>
+      <td><span class="mono" style="color:var(--foreground)">${escapeHtml(j.id)}</span></td>
+      <td><span class="mono" style="color:var(--accent-fg);font-size:11px">${escapeHtml(schedExpr)}</span></td>
+      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._last_run_ago || '—')}</td>
+      <td><span class="dot ${escapeHtml(dotCls)}"></span> <span style="font-size:12px;color:var(--muted-fg)">${escapeHtml(lastStatus || '—')}</span></td>
+      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._next_run_in || '—')}</td>
+      <td style="color:${errors>0?'var(--danger)':'var(--muted-fg)'};font-weight:${errors>0?700:400}">${errors || '—'}</td>
+      <td><div class="toggle-wrap"><input type="checkbox" class="toggle" ${j.enabled?'checked':''}
+        onchange="toggleJob('${escapeHtml(String(j.id))}', this.checked)"></div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function toggleJob(id, enabled) {
+  await fetch('/api/cron/' + id, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ enabled })
+  });
+}
+
+// ── Profile ───────────────────────────────────────────────────────────────
+async function loadProfile() {
+  const rows = await get('/api/profile');
+  window._profileRows = rows;
+  const cats = [...new Set(rows.map(r => r.category))].sort();
+  const filterEl = document.getElementById('profile-filters');
+  filterEl.innerHTML = [['', 'All'], ...cats.map(c => [c, c])].map(([v, l]) =>
+    `<button class="filter-btn ${profileCatFilter===v?'active':''}" onclick="setProfileCat('${v}', this)">${l}</button>`
+  ).join('');
+  renderProfile(rows);
+  ts();
+}
+
+function setProfileCat(v, btn) {
+  profileCatFilter = v;
+  document.querySelectorAll('#profile-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (window._profileRows) renderProfile(window._profileRows);
+}
+
+function renderProfile(rows) {
+  const filtered = profileCatFilter ? rows.filter(r => r.category === profileCatFilter) : rows;
+  const byCat = {};
+  for (const r of filtered) { if (!byCat[r.category]) byCat[r.category] = []; byCat[r.category].push(r); }
+  document.getElementById('profile-body').innerHTML = Object.entries(byCat)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .map(([cat, facets]) => `
+    <div class="cat-section">
+      <div class="cat-title">${cat} <span style="color:var(--muted-fg);font-weight:400">(${facets.length})</span></div>
+      <div class="facets-grid">${facets.map(renderFacet).join('')}</div>
+    </div>`).join('');
+}
+
+function renderFacet(f) {
+  const pos = f.value_position;
+  const conf = f.confidence || 0;
+  const obs = f.observation_count || 0;
+  const hasData = pos != null;
+  const confPct = (conf * 100).toFixed(0);
+  const confFill = conf >= 0.65 ? 'var(--success)' : conf >= 0.35 ? 'var(--warn)' : 'var(--danger)';
+  return `<div class="facet-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="facet-name">${escapeHtml(f.name.replace(/_/g,' '))}</div>
+        <div class="facet-id">${escapeHtml(f.id)}</div>
+      </div>
+      ${sensitivityBadge(f.sensitivity)}
+    </div>
+    ${hasData ? `
+      <div class="spectrum-wrap">
+        <div class="spectrum-labels">
+          <span>${f.spectrum_low || 'low'}</span>
+          <span>${f.spectrum_high || 'high'}</span>
+        </div>
+        <div class="spectrum-track">
+          <div class="spectrum-fill" style="width:${pos*100}%"></div>
+          <div class="spectrum-dot" style="left:${pos*100}%"></div>
+        </div>
+      </div>
+      <div class="facet-meta">
+        <div class="conf-bar-wrap" style="flex:1;min-width:80px">
+          <div class="conf-bar-track"><div class="conf-bar-fill" style="width:${confPct}%;background:${confFill}"></div></div>
+          <span style="font-size:11px;color:${confFill};font-weight:600;flex-shrink:0">${confPct}%</span>
+        </div>
+        <span class="badge badge-muted">${obs} obs</span>
+      </div>` :
+    '<div class="facet-no-data">Insufficient data</div>'}
+  </div>`;
+}
+
+// ── Hypotheses ────────────────────────────────────────────────────────────
+async function loadHypotheses() {
+  const rows = await get('/api/hypotheses');
+  const el = document.getElementById('hypotheses-body');
+  if (!rows.length) { el.innerHTML = emptyState('◉', 'No hypotheses', 'The synthesizer generates hypotheses nightly at 03:00'); return; }
+  el.innerHTML = rows.map(h => {
+    const txt = (h.hypothesis || '').toLowerCase();
+    const isDrift = txt.includes('drift');
+    const isLoop  = txt.includes('loop') || txt.includes('bootstrap');
+    const isDomain = txt.includes('domain') || txt.includes('imbalance');
+    const type = isDrift ? 'drift' : isLoop ? 'loop' : isDomain ? 'domain' : 'behavioral';
+    const badgeCls = isDrift ? 'badge-warn' : isLoop ? 'badge-danger' : isDomain ? 'badge-purple' : 'badge-accent';
+    const conf = h.confidence || 0;
+    return `<div class="hyp-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:6px">
+          <span class="badge ${badgeCls}">${type}</span>
+          <span class="badge badge-muted">${h.status}</span>
+          <span class="badge badge-muted">conf ${(conf*100).toFixed(0)}%</span>
+        </div>
+        <span style="font-size:11px;color:var(--muted-fg)">${fmtDate(h.updated_at)}</span>
+      </div>
+      <p class="hyp-text">${h.hypothesis}</p>
+    </div>`;
+  }).join('');
+  ts();
+}
+
+// ── FGS ───────────────────────────────────────────────────────────────────
+async function loadFGS() {
+  const rows = await get('/api/profile/fgs');
+  document.getElementById('fgs-tbody').innerHTML = rows.slice(0,25).map((f, i) => {
+    const conf = f.confidence;
+    const stale = f.days_stale;
+    return `<tr>
+      <td style="color:var(--muted-fg)">${i+1}</td>
+      <td class="mono" style="color:var(--foreground-2)">${f.id}</td>
+      <td><span class="badge badge-muted">${f.category}</span></td>
+      <td>
+        <div class="conf-bar-wrap">
+          <div class="conf-bar-track" style="width:60px"><div class="conf-bar-fill" style="width:${((conf||0)*100).toFixed(0)}%;background:${confColor(conf)}"></div></div>
+          <span style="font-size:12px;color:${confColor(conf)};font-weight:600">${conf!=null?(conf*100).toFixed(0)+'%':'—'}</span>
+        </div>
+      </td>
+      <td style="color:var(--foreground-2)">${f.observation_count ?? 0}</td>
+      <td style="color:${stale>30?'var(--warn)':'var(--muted-fg)'}">${stale != null ? stale + 'd' : '—'}</td>
+      <td>${sensitivityBadge(f.sensitivity)}</td>
+    </tr>`;
+  }).join('');
+  ts();
+}
+
+// ── Entities ──────────────────────────────────────────────────────────────
+async function loadEntities() {
+  entityCache = await get('/api/memory/entities');
+  const types = [...new Set(entityCache.map(e => e.entity_type))];
+  const filterEl = document.getElementById('entity-filters');
+  filterEl.innerHTML = [['', 'All'], ...types.map(t => [t, t])].map(([v, l]) =>
+    `<button class="filter-btn ${entityTypeFilter===v?'active':''}" onclick="setEntityFilter('${v}', this)">${l}</button>`
+  ).join('');
+  renderEntities(entityCache);
+  ts();
+}
+
+function setEntityFilter(v, btn) {
+  entityTypeFilter = v;
+  document.querySelectorAll('#entity-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEntities(entityCache);
+}
+
+function renderEntityCard(e) {
+  const rel = e.relation;
+  const sent = (rel && rel.sentiment != null) ? Number(rel.sentiment) : null;
+  let relHtml = '';
+  if (rel) {
+    let sentHtml = '';
+    if (sent !== null && !isNaN(sent)) {
+      const bar = '<span class="sent-bar"><span class="sent-fill" style="left:50%;width:' + Math.abs(sent)*50 + '%;background:' + (sent>0?'var(--success)':'var(--danger)') + ';' + (sent<0?'right:50%;left:auto':'') + '"></span></span>';
+      sentHtml = '<span style="display:flex;align-items:center;gap:2px;font-size:11px;color:' + (sent>0.3?'var(--success)':sent<-0.3?'var(--danger)':'var(--warn)') + '">sent ' + (sent>0?'+':'') + sent.toFixed(2) + bar + '</span>';
+    }
+    relHtml = '<div style="margin-top:8px;font-size:11px;color:var(--muted-fg);display:flex;align-items:center;flex-wrap:wrap;gap:4px">'
+      + (rel.relation_type ? '<span class="badge badge-blue">' + escapeHtml(rel.relation_type) + '</span>' : '')
+      + (rel.dynamic ? '<span class="badge badge-muted">' + escapeHtml(rel.dynamic) + '</span>' : '')
+      + sentHtml
+      + '</div>';
+  }
+  return '<div class="facet-card">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center">'
+    + '<div style="font-weight:600;font-size:14px">' + escapeHtml(e.name) + '</div>'
+    + '<div style="display:flex;align-items:center;gap:4px">'
+    + '<span class="badge badge-muted">' + escapeHtml(String(e.mention_count)) + '</span>'
+    + '<button class="btn-icon" onclick="openEntityModal(' + Number(e.id) + ')" title="Edit">✎</button>'
+    + '</div></div>'
+    + (e.label ? '<div style="font-size:12px;color:var(--accent);margin-top:2px">' + escapeHtml(e.label) + '</div>' : '')
+    + (e.description ? '<div style="font-size:12px;color:var(--muted-fg);margin-top:6px;line-height:1.4">' + escapeHtml(e.description.slice(0,120)) + '</div>' : '')
+    + relHtml
+    + '</div>';
+}
+
+function renderEntities(entities) {
+  const filtered = entityTypeFilter ? entities.filter(e => e.entity_type === entityTypeFilter) : entities;
+  if (!filtered.length) { document.getElementById('entities-body').innerHTML = emptyState('◈', 'No entities', 'Extracted daily by the entity extractor'); return; }
+  const byType = {};
+  for (const e of filtered) { if (!byType[e.entity_type]) byType[e.entity_type] = []; byType[e.entity_type].push(e); }
+  let html = '';
+  for (const [type, ents] of Object.entries(byType)) {
+    html += '<div class="cat-section"><div class="cat-title">' + escapeHtml(type) + '</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">'
+      + ents.map(renderEntityCard).join('')
+      + '</div></div>';
+  }
+  document.getElementById('entities-body').innerHTML = html;
+}
+
+// ── Episodes ──────────────────────────────────────────────────────────────
+async function loadEpisodes() {
+  episodeCache = await get('/api/memory/episodes');
+  const types = [...new Set(episodeCache.map(e => e.episode_type))].sort();
+  const filterEl = document.getElementById('episode-filters');
+  filterEl.innerHTML = [['', 'All'], ...types.map(t => [t, t])].map(([v, l]) =>
+    `<button class="filter-btn ${episodeTypeFilter===v?'active':''}" onclick="setEpisodeFilter('${v}', this)">${l}</button>`
+  ).join('');
+  renderEpisodes(episodeCache);
+  ts();
+}
+
+function setEpisodeFilter(v, btn) {
+  episodeTypeFilter = v;
+  document.querySelectorAll('#episode-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEpisodes(episodeCache);
+}
+
+function renderEpisodes(rows) {
+  const filtered = (episodeTypeFilter ? rows.filter(r => r.episode_type === episodeTypeFilter) : rows).slice(0, 60);
+  if (!filtered.length) { document.getElementById('episodes-body').innerHTML = emptyState('◎', 'No episodes', 'Extracted by the memory cron'); return; }
+  const typeBadge = (t) => {
+    const cls = {fact:'badge-accent', event:'badge-blue', habit:'badge-warn', preference:'badge-purple', opinion:'badge-muted'}[t] || 'badge-muted';
+    return `<span class="badge ${cls}">${escapeHtml(t)}</span>`;
+  };
+  document.getElementById('episodes-body').innerHTML = filtered.map(e => `
+    <div class="mem-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:6px">${typeBadge(e.episode_type)} <span class="badge badge-muted">${(e.confidence*100).toFixed(0)}%</span></div>
+        <div style="display:flex;align-items:center;gap:2px">
+          <span style="font-size:11px;color:var(--muted-fg);margin-right:4px">${fmtDate(e.extracted_at)}</span>
+          <button class="btn-icon" onclick="openEpisodeModal(${Number(e.id)})" title="Edit">✎</button>
+          <button class="btn-icon" onclick="deactivateEpisode(${Number(e.id)})" title="Mark as past" style="color:var(--warn-muted)">⊘</button>
+        </div>
+      </div>
+      <p class="mem-content">${escapeHtml(e.content)}</p>
+      ${e.entity_names ? `<div class="mem-meta">entities: ${escapeHtml(e.entity_names)}</div>` : ''}
+      <div class="mem-meta">${escapeHtml(e.source_type)}</div>
+    </div>`).join('');
+}
+
+// ── Decisions ─────────────────────────────────────────────────────────────
+async function loadDecisions() {
+  const rows = await get('/api/memory/decisions');
+  window._decisionsCache = rows;
+  const el = document.getElementById('decisions-body');
+  if (!rows.length) { el.innerHTML = emptyState('◑', 'No decisions', 'Extracted daily by the decisions cron'); return; }
+  const byDomain = {};
+  for (const d of rows) { const k = d.domain || '— no domain —'; if (!byDomain[k]) byDomain[k] = []; byDomain[k].push(d); }
+  // Sort: known domains first, then null
+  const sorted = Object.entries(byDomain).sort(([a], [b]) => {
+    if (a.startsWith('—')) return 1;
+    if (b.startsWith('—')) return -1;
+    return a.localeCompare(b);
+  });
+  el.innerHTML = sorted.map(([domain, decisions]) => `
+    <div class="cat-section">
+      <div class="cat-title">${escapeHtml(domain)} <span style="color:var(--muted-fg);font-weight:400">(${decisions.length})</span></div>
+      ${decisions.map(d => {
+        const dirBadge = d.direction === 'high' ? 'badge-success' : d.direction === 'low' ? 'badge-accent' : 'badge-muted';
+        return `<div class="mem-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:6px">
+              ${d.direction ? `<span class="badge ${dirBadge}">${escapeHtml(d.direction)}</span>` : '<span class="badge badge-muted">—</span>'}
+              ${d.context ? `<span class="badge badge-muted">${escapeHtml(d.context.slice(0,40))}</span>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:2px">
+              <span style="font-size:11px;color:var(--muted-fg);margin-right:4px">${fmtDate(d.decided_at || d.extracted_at)}</span>
+              <button class="btn-icon" onclick="openDecisionModal(${Number(d.id)})" title="Modifica">✎</button>
+            </div>
+          </div>
+          <p class="mem-content">${escapeHtml(d.decision)}</p>
+          ${d.facet_ids ? `<div class="mem-meta" style="font-family:var(--font-mono)">facets: ${escapeHtml(String(d.facet_ids))}</div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+  ts();
+}
+
+// ── Check-in ──────────────────────────────────────────────────────────────
+async function loadCheckin() {
+  const rows = await get('/api/checkin/history');
+  document.getElementById('checkin-body').innerHTML = rows.map(c => {
+    const replied = !!c.reply_text;
+    const hasFollowup = !!c.followup_sent_at;
+    return `<div class="checkin-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-accent" style="font-family:var(--font-mono)">${escapeHtml(c.facet_id || '—')}</span>
+          ${replied ? '<span class="badge badge-success">reply received</span>' : '<span class="badge badge-muted">pending</span>'}
+          ${hasFollowup ? '<span class="badge badge-blue">followup sent</span>' : ''}
+          ${c.observations_extracted ? `<span class="badge badge-muted">${c.observations_extracted} obs extracted</span>` : ''}
+        </div>
+        <span style="font-size:11px;color:var(--muted-fg)">${fmtDateTime(c.asked_at)}</span>
+      </div>
+      <p class="checkin-q"><strong>Q</strong> ${escapeHtml(c.question_text)}</p>
+      ${c.reply_text ? `<p class="checkin-a"><strong>A</strong> ${escapeHtml(c.reply_text)}</p>` : ''}
+    </div>`;
+  }).join('');
+  ts();
+}
+
+// ── Metrics ───────────────────────────────────────────────────────────────
+async function loadMetrics() {
+  const rows = await get('/api/metrics/communication');
+  const el = document.getElementById('metrics-body');
+  if (!rows.length) {
+    el.innerHTML = emptyState('◈', 'No metrics', 'Run: python3 -m soulkiller.liwc');
+    return;
+  }
+  const byType = {};
+  for (const r of rows) { if (!byType[r.metric_type]) byType[r.metric_type] = r; }
+  el.innerHTML = Object.entries(byType).map(([type, r]) => {
+    let data = {};
+    try { data = JSON.parse(r.metric_data); } catch(e) {}
+
+    // activity_hours: render a mini 24h bar chart instead of raw array
+    if (type === 'activity_hours' && Array.isArray(data.hours)) {
+      const hours = data.hours;
+      const max = Math.max(...hours, 1);
+      const bars = hours.map((v, i) => {
+        const h = Math.round((v / max) * 40);
+        const isActive = v > 0;
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+          <div style="width:100%;height:40px;display:flex;align-items:flex-end">
+            <div style="width:100%;height:${h}px;background:${isActive?'var(--accent)':'var(--muted)'};border-radius:2px 2px 0 0;min-height:${v>0?2:0}px"></div>
+          </div>
+          ${i % 4 === 0 ? `<span style="font-size:9px;color:var(--muted-fg)">${i}</span>` : '<span style="font-size:9px"> </span>'}
+        </div>`;
+      }).join('');
+      return `<div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">activity hours</div>
+          <span style="font-size:11px;color:var(--muted-fg)">${r.platform} · n=${r.sample_size} · peak ${data.peak_hour}:00 · range ${data.active_range}</span>
+        </div>
+        <div style="display:flex;gap:1px;align-items:flex-end;height:56px">${bars}</div>
+      </div>`;
+    }
+
+    // All other metric types: show scalar values only (skip arrays/objects)
+    const scalars = Object.entries(data).filter(([,v]) => typeof v === 'number' || typeof v === 'string');
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="card-title" style="margin-bottom:0">${type}</div>
+        <span style="font-size:11px;color:var(--muted-fg)">${r.platform} · ${r.chat_id} · n=${r.sample_size}</span>
+      </div>
+      <div class="metric-vals">
+        ${scalars.slice(0,10).map(([k,v]) => `
+          <div class="metric-val-item">
+            <div class="metric-val-num">${typeof v==='number'?v.toFixed(v<10?2:0):v}</div>
+            <div class="metric-val-key">${k.replace(/_/g,' ')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  ts();
+}
+
+// ── Biofeedback ───────────────────────────────────────────────────────────
+const BIO_SIGNALS = {
+  hrv_rmssd:       { label: 'HRV RMSSD',      unit: 'ms',   icon: '⟁', facet: 'emotional.resilience_pattern' },
+  rhr:             { label: 'RHR',             unit: 'bpm',  icon: '♡' },
+  stress_avg:      { label: 'Avg Stress',    unit: '',     icon: '⚡', facet: 'temporal.impulsivity_regulation' },
+  sleep_deep_pct:  { label: 'Deep Sleep',    unit: '%',    icon: '◉', facet: 'emotional.distress_tolerance' },
+  sleep_rem_pct:   { label: 'REM',           unit: '%',    icon: '◑', facet: 'emotional.emotion_clarity' },
+  sleep_score:     { label: 'Sleep Score',   unit: '/100', icon: '★', facet: 'emotional.distress_tolerance' },
+  sleep_onset_ts:  { label: 'Sleep Onset',   unit: '',     icon: '◐', facet: 'temporal.planning_horizon',
+                     fmt: v => new Date(v*1000).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) },
+  sleep_total_min: { label: 'Total Sleep',   unit: 'min',  icon: '◌' },
+  sleep_deep_min:  { label: 'Deep',          unit: 'min',  icon: '◉' },
+  sleep_light_min: { label: 'Light',         unit: 'min',  icon: '◎' },
+  sleep_rem_min:   { label: 'REM',           unit: 'min',  icon: '◑' },
+  sleep_offset_ts: { label: 'Wake Time',     unit: '',     icon: '◑',
+                     fmt: v => new Date(v*1000).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) },
+  spo2:            { label: 'SpO₂',          unit: '%',    icon: '○' },
+  pai_score:       { label: 'PAI Score',     unit: '',     icon: '◈', facet: 'temporal.routine_attachment' },
+  hr_mean:         { label: 'Avg HR',        unit: 'bpm',  icon: '〜' },
+};
+
+function bioSparkline(canvasId, key, data7d, color, yMin, yMax, chartKey) {
+  const el = document.getElementById(canvasId);
+  if (!el) return;
+  const raw = (data7d || {})[key] || [];
+  if (charts[chartKey]) { charts[chartKey].destroy(); delete charts[chartKey]; }
+  if (!raw.length) {
+    el.closest('.chart-wrap').innerHTML =
+      `<div class="mem-meta" style="text-align:center;padding:28px 8px;font-size:11px">No data</div>`;
+    return;
+  }
+  const sorted = [...raw].sort((a, b) => a.date.localeCompare(b.date));
+  charts[chartKey] = new Chart(el.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: sorted.map(r => r.date.slice(5)),
+      datasets: [{ data: sorted.map(r => r.value), borderColor: color,
+        backgroundColor: color + '20', borderWidth: 2,
+        pointRadius: 3, pointBackgroundColor: color, fill: true, tension: 0.35 }]
+    },
+    options: { ...chartOpts({ yMin, yMax }), plugins: { legend: { display: false } } }
+  });
+}
+
+async function loadBiofeedback() {
+  const summary = await get('/api/biofeedback/summary');
+  const history = await get('/api/biofeedback');
+
+  // Ultima lettura
+  const dateEl = document.getElementById('bio-date');
+  const latestEl = document.getElementById('bio-latest');
+  dateEl.textContent = summary.latest_date || '—';
+  const lat = summary.latest || {};
+
+  // Display order for latest card
+  const LATEST_ORDER = ['hrv_rmssd','rhr','stress_avg','sleep_onset_ts','sleep_offset_ts',
+    'sleep_total_min','sleep_deep_pct','sleep_deep_min','sleep_rem_pct','sleep_rem_min',
+    'sleep_light_min','sleep_score','spo2','pai_score'];
+
+  if (Object.keys(lat).length === 0) {
+    latestEl.innerHTML = `<div class="mem-meta" style="text-align:center;padding:24px 0">
+      No data — the ring syncs overnight.<br>
+      <span style="font-size:11px;color:var(--muted-fg)">First reading will appear after the first night with the ring.</span>
+    </div>`;
+  } else {
+    latestEl.innerHTML = `<div class="metric-vals" style="flex-wrap:wrap;gap:14px;margin-top:8px">
+      ${LATEST_ORDER.filter(k => lat[k] != null && BIO_SIGNALS[k]).map(k => {
+        const cfg = BIO_SIGNALS[k];
+        const v = lat[k];
+        const display = cfg.fmt ? cfg.fmt(v) : `${typeof v === 'number' ? (v > 10 ? Math.round(v) : v.toFixed(1)) : v}${cfg.unit}`;
+        const facetBadge = cfg.facet ? `<div style="font-size:9px;color:var(--muted-fg);margin-top:2px">→ ${cfg.facet.split('.')[1]}</div>` : '';
+        return `<div class="metric-val-item">
+          <div class="metric-val-num">${cfg.icon} ${display}</div>
+          <div class="metric-val-key">${cfg.label}</div>
+          ${facetBadge}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // 6 sparkline charts
+  const d7 = summary.by_signal_7d || {};
+  bioSparkline('chart-hrv',         'hrv_rmssd',      d7, '#2dd4bf', 20,  80,  'hrv');
+  bioSparkline('chart-rhr',         'rhr',            d7, '#60a5fa', 40,  90,  'rhr');
+  bioSparkline('chart-stress',      'stress_avg',     d7, '#fb923c', 0,   80,  'stress');
+  bioSparkline('chart-deep',        'sleep_deep_pct', d7, '#a78bfa', 0,   50,  'deep');
+  bioSparkline('chart-rem',         'sleep_rem_pct',  d7, '#f472b6', 0,   35,  'rem');
+  bioSparkline('chart-sleep-score', 'sleep_score',    d7, '#4ade80', 0,   100, 'sleepScore');
+
+  // History table
+  const histEl = document.getElementById('bio-history');
+  if (!history.length) {
+    histEl.innerHTML = emptyState('♡', 'No historical data', 'Data will appear after the first night');
+    ts(); return;
+  }
+  const byDate = {};
+  history.forEach(r => { if (!byDate[r.date]) byDate[r.date] = []; byDate[r.date].push(r); });
+  histEl.innerHTML = Object.entries(byDate).slice(0, 14).map(([date, rows]) =>
+    `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--card-border)">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px">${date}</div>
+      <div class="metric-vals" style="flex-wrap:wrap;gap:10px">
+        ${rows.filter(r => BIO_SIGNALS[r.signal_type] && r.value != null).map(r => {
+          const cfg = BIO_SIGNALS[r.signal_type];
+          const display = cfg.fmt ? cfg.fmt(r.value) : `${r.value > 10 ? Math.round(r.value) : r.value.toFixed(1)}${cfg.unit}`;
+          return `<div class="metric-val-item">
+            <div class="metric-val-num" style="font-size:14px">${display}</div>
+            <div class="metric-val-key">${cfg.label}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`
+  ).join('');
+  ts();
+}
+
+// ── Constructs ────────────────────────────────────────────────────────────
+async function loadConstructs() {
+  const [motives, stress, schemas] = await Promise.all([
+    get('/api/motives'), get('/api/metrics/stress'), get('/api/schemas')
+  ]);
+  renderMotives(motives);
+  renderStress(stress);
+  renderSchemas(schemas);
+  ts();
+}
+
+function renderMotives(motives) {
+  const meta = document.getElementById('motives-meta');
+  if (!motives.length) {
+    document.getElementById('chart-motives').style.display='none';
+    meta.textContent = 'No data — runs on the 10th of each month';
+    return;
+  }
+  const m = motives[0];
+  const ctx = document.getElementById('chart-motives').getContext('2d');
+  if (charts.motives) charts.motives.destroy();
+  charts.motives = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['n-Achievement', 'n-Affiliation', 'n-Power'],
+      datasets: [{ data: [m.n_ach, m.n_aff, m.n_pow],
+        backgroundColor: ['#2dd4bf', '#60a5fa', '#a78bfa'],
+        borderWidth: 0, borderRadius: 4 }]
+    },
+    options: { ...chartOpts({ yMax: 1 }), plugins: { legend: { display: false } } }
+  });
+  meta.textContent = `n=${m.sample_size} · ${fmtDate(m.computed_at)}`;
+}
+
+function renderStress(stress) {
+  const el = document.getElementById('stress-body');
+  if (!stress.length) { el.innerHTML = emptyState('◉', 'No data', 'Runs every Monday'); return; }
+  const SKIP = ['id', 'computed_at', 'period', 'dominant_signal', 'stress_level'];
+  const levelColor = { low: 'var(--success)', medium: 'var(--warn)', high: 'var(--danger)', critical: 'var(--danger)' };
+  el.innerHTML = stress.slice(0,4).map(s => {
+    const numeric = Object.entries(s).filter(([k,v]) => !SKIP.includes(k) && typeof v === 'number');
+    const lvl = s.stress_level || '';
+    return `<div style="padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--card-border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--muted-fg)">${s.period || fmtDate(s.computed_at)}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${lvl ? `<span class="badge" style="background:${levelColor[lvl]||'var(--muted)'};color:#000">${lvl}</span>` : ''}
+          ${s.dominant_signal ? `<span class="badge badge-muted">${s.dominant_signal}</span>` : ''}
+          <span style="font-size:18px;font-weight:700;color:${s.stress_index>0.6?'var(--danger)':s.stress_index>0.35?'var(--warn)':'var(--success)'}">
+            ${typeof s.stress_index === 'number' ? s.stress_index.toFixed(2) : '—'}
+          </span>
+        </div>
+      </div>
+      <div class="metric-vals">
+        ${numeric.map(([k,v]) => `
+          <div class="metric-val-item">
+            <div class="metric-val-num" style="font-size:14px;color:${v>0?'var(--danger)':v<0?'var(--success)':'var(--foreground-2)'}">${v>0?'+':''}${v.toFixed(2)}</div>
+            <div class="metric-val-key">${k.replace(/_delta$/,' Δ').replace(/_/g,' ')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSchemas(schemas) {
+  const el = document.getElementById('schemas-body');
+  if (!schemas.length) { el.innerHTML = emptyState('◌', 'No data', 'Runs on the 1st of each month'); return; }
+  function parseJsonArr(v) {
+    if (!v) return [];
+    try { const a = JSON.parse(v); return Array.isArray(a) ? a : [v]; } catch { return [String(v)]; }
+  }
+  const actColor = a => a >= 0.7 ? 'var(--danger)' : a >= 0.4 ? 'var(--warn)' : 'var(--success)';
+  el.innerHTML = schemas.map(s => `
+    <div class="mem-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <span style="font-weight:600;font-size:14px;color:var(--foreground)">${s.schema_name || '—'}</span>
+          ${s.schema_domain ? `<span class="badge badge-purple" style="margin-left:8px">${s.schema_domain}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          ${s.activation_level != null ? `<span style="font-size:13px;font-weight:700;color:${actColor(s.activation_level)}">${(s.activation_level*100).toFixed(0)}%</span>` : ''}
+          ${s.confidence != null ? `<span class="badge badge-muted">conf ${(s.confidence*100).toFixed(0)}%</span>` : ''}
+          ${s.consensus != null ? `<span class="badge badge-muted">${s.consensus} src</span>` : ''}
+        </div>
+      </div>
+      ${s.evidence ? `<p style="font-size:12px;color:var(--foreground-2);line-height:1.5;margin-bottom:8px;font-style:italic">${s.evidence.slice(0,200)}</p>` : ''}
+      ${parseJsonArr(s.trigger_contexts).length ? `
+        <div style="margin-bottom:6px">
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg)">Trigger</span>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+            ${parseJsonArr(s.trigger_contexts).map(t => `<span class="badge badge-warn">${t}</span>`).join('')}
+          </div>
+        </div>` : ''}
+      ${parseJsonArr(s.behavioral_signatures).length ? `
+        <div>
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg)">Behaviors</span>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+            ${parseJsonArr(s.behavioral_signatures).map(b => `<span class="badge badge-muted">${b}</span>`).join('')}
+          </div>
+        </div>` : ''}
+      <div class="mem-meta" style="margin-top:8px">detected ${fmtDate(s.first_detected_at)} · updated ${fmtDate(s.updated_at)}</div>
+    </div>`).join('');
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────
+function emptyState(icon, title, sub) {
+  return `<div class="empty"><div class="empty-icon">${icon}</div><div class="empty-text">${title}</div><div class="empty-sub">${sub}</div></div>`;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+loadHealth();
+</script>
+</body>
+</html>

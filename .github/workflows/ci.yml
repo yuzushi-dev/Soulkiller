@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+  import-check:
+    name: Import check (all entrypoints)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Verify all module entrypoints import cleanly
+        run: |
+          python - << 'EOF'
+          import importlib, sys
+
+          entrypoints = [
+              # core
+              "soulkiller.extract", "soulkiller.checkin", "soulkiller.passive_scan",
+              "soulkiller.reply_extract", "soulkiller.synthesize", "soulkiller.profile_sync",
+              "soulkiller.checkin_followup",
+              # daily
+              "soulkiller.entity_extract", "soulkiller.decisions", "soulkiller.healthcheck",
+              "soulkiller.memory",
+              # biofeedback
+              "soulkiller.biofeedback", "soulkiller.biofeedback_gadgetbridge",
+              "soulkiller.biofeedback_gb_ingest", "soulkiller.muse_aggregate",
+              "soulkiller.muse_recorder",
+              # weekly
+              "soulkiller.liwc", "soulkiller.stress_index",
+              # optional
+              "soulkiller.budget_bridge", "soulkiller.voicenote", "soulkiller.domain_prober",
+              "soulkiller.backfill", "soulkiller.motives",
+              # monthly
+              "soulkiller.schemas", "soulkiller.goals", "soulkiller.sdt", "soulkiller.portrait",
+              "soulkiller.idiolect", "soulkiller.caps", "soulkiller.attachment",
+              "soulkiller.defenses", "soulkiller.narrative", "soulkiller.appraisal",
+              "soulkiller.mental_models", "soulkiller.dual_process", "soulkiller.constructs",
+              # demo
+              "soulkiller.demo_runner",
+          ]
+
+          failed = []
+          for mod in entrypoints:
+              try:
+                  importlib.import_module(mod)
+              except Exception as e:
+                  failed.append(f"{mod}: {e}")
+
+          if failed:
+              print("FAILED:")
+              for f in failed:
+                  print(f"  {f}")
+              sys.exit(1)
+
+          print(f"All {len(entrypoints)} entrypoints import cleanly.")
+          EOF
+
+  sanitization:
+    name: Sanitization checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Run sanitization tests
+        run: |
+          python -m pytest tests/test_docs_sanitization_markers.py \
+                           tests/test_hook_sanitization_markers.py \
+                           tests/test_python_sanitization_markers.py \
+                           tests/test_python_depersonalization_markers.py \
+                           -v

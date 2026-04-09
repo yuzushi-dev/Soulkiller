@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "soulkiller"
+version = "0.9.0"
+description = "Longitudinal computational personality modeling from naturalistic digital trace data and wearable biofeedback."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "AGPL-3.0-only"}
+authors = [
+  { name = "Martian Engineering" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+webui = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2.0",
+]
+anthropic = [
+  "anthropic>=0.20",
+]
+openai = [
+  "openai>=1.0",
+]
+all-providers = [
+  "anthropic>=0.20",
+  "openai>=1.0",
+]
+keywords = ["agents", "personality-modeling", "reflective-systems", "demo"]
+
+[project.urls]
+Homepage = "https://github.com/yuzushi-dev/soulkiller"
+Documentation = "https://github.com/yuzushi-dev/soulkiller/tree/main/docs"
+
+[project.scripts]
+soulkiller-demo = "soulkiller.demo_runner:main"
+soulkiller-demo-ui = "soulkiller.demo_webui:main"
+soulkiller-webui = "soulkiller.webui:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
