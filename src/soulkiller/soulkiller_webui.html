@@ -1161,12 +1161,12 @@ async function loadHealth() {
 
 function renderKPI(h) {
   const items = [
-    { val: h.total_observations.toLocaleString('it-IT'), label: 'Osservazioni', cls: 'kpi-accent' },
-    { val: h.trait_coverage_pct + '%', label: 'Coverage facet', cls: h.trait_coverage_pct >= 70 ? 'kpi-success' : 'kpi-warn' },
-    { val: (h.avg_confidence * 100).toFixed(1) + '%', label: 'Avg Confidence', cls: h.avg_confidence >= 0.6 ? 'kpi-success' : 'kpi-warn' },
-    { val: h.active_alerts, label: 'Ipotesi attive', cls: h.active_alerts > 0 ? 'kpi-warn' : 'kpi-muted' },
+    { val: h.total_observations.toLocaleString('en-US'), label: 'Observations', cls: 'kpi-accent' },
+    { val: h.trait_coverage_pct + '%', label: 'Facet coverage', cls: h.trait_coverage_pct >= 70 ? 'kpi-success' : 'kpi-warn' },
+    { val: (h.avg_confidence * 100).toFixed(1) + '%', label: 'Avg confidence', cls: h.avg_confidence >= 0.6 ? 'kpi-success' : 'kpi-warn' },
+    { val: h.active_alerts, label: 'Active hypotheses', cls: h.active_alerts > 0 ? 'kpi-warn' : 'kpi-muted' },
     { val: h.pending_checkin, label: 'Check-in pending', cls: h.pending_checkin > 0 ? 'kpi-accent' : 'kpi-muted' },
-    { val: h.inbox_unprocessed.toLocaleString('it-IT'), label: 'Inbox unprocessed', cls: h.inbox_unprocessed > 50 ? 'kpi-warn' : 'kpi-muted' },
+    { val: h.inbox_unprocessed.toLocaleString('en-US'), label: 'Inbox unprocessed', cls: h.inbox_unprocessed > 50 ? 'kpi-warn' : 'kpi-muted' },
   ];
   document.getElementById('health-kpi').innerHTML = items.map(i => `
     <div class="kpi-card">
@@ -1178,9 +1178,9 @@ function renderKPI(h) {
 function renderAlerts(h, obs) {
   const alerts = [];
   if (obs.bootstrap_loop_risk)
-    alerts.push(`<div class="alert alert-danger"><span class="alert-icon">⚠</span><div><strong>Bootstrap loop risk</strong> — ${obs.session_behavioral_pct_7d}% delle osservazioni negli ultimi 7 giorni provengono da session_behavioral (soglia: 60%). Il sintetizzatore ridurrà il peso automaticamente.</div></div>`);
+    alerts.push(`<div class="alert alert-danger"><span class="alert-icon">⚠</span><div><strong>Bootstrap loop risk</strong> — ${obs.session_behavioral_pct_7d}% of observations in the last 7 days come from session_behavioral (threshold: 60%). The synthesizer will reduce their weight automatically.</div></div>`);
   if (h.inbox_unprocessed > 200)
-    alerts.push(`<div class="alert alert-warn"><span class="alert-icon">◉</span><div><strong>${h.inbox_unprocessed.toLocaleString()} messaggi</strong> in inbox non ancora processati dall'extractor.</div></div>`);
+    alerts.push(`<div class="alert alert-warn"><span class="alert-icon">◉</span><div><strong>${h.inbox_unprocessed.toLocaleString()} messages</strong> in inbox not yet processed by the extractor.</div></div>`);
   document.getElementById('health-alerts').innerHTML = alerts.join('');
 }
 
