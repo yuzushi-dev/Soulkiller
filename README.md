@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <a href="https://yuzushi-dev.github.io/Soulkiller/" target="_blank" rel="noopener noreferrer">→ Live demo</a>
+</p>
+
+<p align="center">
   <img src="docs/sk_demo-2x.png" alt="Soulkiller demo UI" width="430">
 </p>
 
