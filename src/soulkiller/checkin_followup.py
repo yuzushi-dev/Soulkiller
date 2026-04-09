@@ -7,7 +7,7 @@ Schedule:   on-demand (triggered by the soulkiller-capture hook when a
 Reads the pending-checkin.json signal file, acknowledges the reply,
 and records the exchange in the database.
 """
-from soulkiller.soulkiller_daily_stress import main
+from soulkiller.soulkiller_reply_extractor import main
 
 if __name__ == "__main__":
     main()
