@@ -198,6 +198,19 @@ CREATE INDEX IF NOT EXISTS idx_episodes_active ON episodes(active);
 CREATE INDEX IF NOT EXISTS idx_decisions_domain ON decisions(domain);
 CREATE INDEX IF NOT EXISTS idx_entity_relations_entity ON entity_relations(entity_id);
 
+-- IMP-07: CAPS if-then situation-behavior signatures
+CREATE TABLE IF NOT EXISTS caps_signatures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    situation_type TEXT NOT NULL,
+    situation_cues TEXT,
+    behavioral_response TEXT,
+    emotional_response TEXT,
+    facet_ids TEXT,
+    confidence REAL DEFAULT 0.5,
+    created_at TEXT NOT NULL,
+    UNIQUE(situation_type)
+);
+
 -- IMP-07: CAPS prediction validation loop
 CREATE TABLE IF NOT EXISTS caps_predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -256,6 +269,47 @@ CREATE TABLE IF NOT EXISTS biofeedback_readings (
 );
 CREATE INDEX IF NOT EXISTS idx_biofeedback_date ON biofeedback_readings(date);
 CREATE INDEX IF NOT EXISTS idx_biofeedback_type ON biofeedback_readings(signal_type);
+
+-- LIWC-style weekly language metrics
+CREATE TABLE IF NOT EXISTS liwc_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    week_label TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    UNIQUE(week_label)
+);
+
+-- Weekly stress index snapshots
+CREATE TABLE IF NOT EXISTS stress_snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    stress_index REAL NOT NULL,
+    stress_level TEXT NOT NULL,
+    dominant_signal TEXT,
+    period TEXT NOT NULL,
+    hrv_delta REAL,
+    rhr_delta REAL,
+    stress_avg_delta REAL,
+    sleep_score_delta REAL,
+    computed_at TEXT NOT NULL
+);
+
+-- Cognitive schemas (Young / Liotti model)
+CREATE TABLE IF NOT EXISTS schemas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    schema_name TEXT NOT NULL,
+    schema_domain TEXT,
+    activation_level REAL DEFAULT 0.5,
+    confidence REAL DEFAULT 0.5,
+    consensus REAL DEFAULT 0.5,
+    evidence TEXT,
+    trigger_contexts TEXT,
+    behavioral_signatures TEXT,
+    first_detected_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(schema_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_stress_snapshots_period ON stress_snapshots(period);
+CREATE INDEX IF NOT EXISTS idx_schemas_domain ON schemas(schema_domain);
 """
 
 # ── 46 Facet Seed Data ──────────────────────────────────────────────────────

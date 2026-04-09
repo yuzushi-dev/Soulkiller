@@ -27,6 +27,7 @@ from .public_runtime import (
     SUMMARY_FILENAME,
 )
 from .demo_webui import write_demo_console
+from .soulkiller_db import SCHEMA_SQL as _DEMO_DB_SCHEMA
 
 
 # ── Synthetic signal extraction rules ────────────────────────────────────────
@@ -340,185 +341,8 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
 
 
 # ── Demo SQLite database ──────────────────────────────────────────────────────
+# Schema is imported from soulkiller_db.SCHEMA_SQL (single source of truth).
 
-_DEMO_DB_SCHEMA = """
-CREATE TABLE IF NOT EXISTS facets (
-    id TEXT PRIMARY KEY,
-    category TEXT,
-    name TEXT,
-    description TEXT,
-    spectrum_low TEXT,
-    spectrum_high TEXT,
-    sensitivity REAL DEFAULT 1.0
-);
-
-CREATE TABLE IF NOT EXISTS traits (
-    facet_id TEXT PRIMARY KEY,
-    value_position REAL,
-    confidence REAL,
-    observation_count INTEGER DEFAULT 0,
-    last_observation_at TEXT,
-    last_synthesis_at TEXT,
-    status TEXT DEFAULT 'active',
-    notes TEXT
-);
-
-CREATE TABLE IF NOT EXISTS observations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    facet_id TEXT,
-    signal_strength REAL,
-    direction TEXT,
-    source_type TEXT DEFAULT 'message',
-    raw_excerpt TEXT,
-    message_id TEXT,
-    created_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS hypotheses (
-    id TEXT PRIMARY KEY,
-    hypothesis TEXT,
-    status TEXT DEFAULT 'active',
-    confidence REAL,
-    supporting_observations TEXT,
-    created_at TEXT,
-    updated_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS model_snapshots (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    snapshot_at TEXT,
-    total_observations INTEGER,
-    avg_confidence REAL,
-    coverage_pct REAL
-);
-
-CREATE TABLE IF NOT EXISTS inbox (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    message_id TEXT UNIQUE,
-    content TEXT,
-    channel_id TEXT,
-    received_at TEXT,
-    processed INTEGER DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS checkin_exchanges (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    facet_id TEXT,
-    question_text TEXT,
-    reply_text TEXT,
-    reply_captured_at TEXT,
-    observations_extracted INTEGER DEFAULT 0,
-    asked_at TEXT,
-    followup_sent_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS entities (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    entity_type TEXT,
-    name TEXT,
-    label TEXT,
-    description TEXT,
-    mention_count INTEGER DEFAULT 1,
-    first_seen_at TEXT,
-    last_seen_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS entity_relations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    entity_id INTEGER,
-    relation_type TEXT,
-    dynamic TEXT,
-    sentiment TEXT,
-    updated_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS episodes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    episode_type TEXT,
-    content TEXT,
-    source_type TEXT,
-    confidence REAL,
-    occurred_at TEXT,
-    extracted_at TEXT,
-    entity_names TEXT,
-    active INTEGER DEFAULT 1
-);
-
-CREATE TABLE IF NOT EXISTS decisions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    decision TEXT,
-    domain TEXT,
-    direction TEXT,
-    facet_ids TEXT,
-    decided_at TEXT,
-    extracted_at TEXT,
-    context TEXT
-);
-
-CREATE TABLE IF NOT EXISTS communication_metrics (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    platform TEXT,
-    chat_id TEXT,
-    period TEXT,
-    metric_type TEXT,
-    metric_data TEXT,
-    sample_size INTEGER,
-    computed_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS liwc_metrics (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    week_label TEXT,
-    computed_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS stress_snapshots (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    stress_index REAL,
-    stress_level TEXT,
-    dominant_signal TEXT,
-    period TEXT,
-    hrv_delta REAL,
-    rhr_delta REAL,
-    stress_avg_delta REAL,
-    sleep_score_delta REAL,
-    computed_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS implicit_motives (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    n_ach REAL,
-    n_aff REAL,
-    n_pow REAL,
-    sample_size INTEGER,
-    evidence TEXT,
-    computed_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS schemas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    schema_name TEXT,
-    schema_domain TEXT,
-    activation_level REAL,
-    confidence REAL,
-    consensus REAL,
-    evidence TEXT,
-    trigger_contexts TEXT,
-    behavioral_signatures TEXT,
-    first_detected_at TEXT,
-    updated_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS biofeedback_readings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT,
-    signal_type TEXT,
-    value REAL,
-    unit TEXT,
-    metadata_json TEXT,
-    pulled_at TEXT
-);
-"""
 
 
 def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> None:
@@ -554,30 +378,32 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
 
         # observations (from seed sample + synthetic extraction pass)
         seed_obs = seed.get("observations_sample", [])
-        for o in seed_obs:
+        for i, o in enumerate(seed_obs):
+            source_ref = o.get("message_id") or f"seed-{i:03d}"
             db.execute(
-                "INSERT INTO observations "
-                "(facet_id, signal_strength, direction, source_type, raw_excerpt, message_id, created_at) "
+                "INSERT OR IGNORE INTO observations "
+                "(facet_id, signal_strength, extracted_signal, source_type, content, source_ref, created_at) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (o["facet_id"], o["signal_strength"], o["direction"],
-                 "message", o.get("note", ""), o.get("message_id", ""), now_iso),
+                (o["facet_id"], o["signal_strength"], o.get("direction"),
+                 "message", o.get("note", ""), source_ref, now_iso),
             )
-        for o in observations:
+        for i, o in enumerate(observations):
+            source_ref = o.get("message_id") or f"synth-{i:03d}"
             db.execute(
-                "INSERT INTO observations "
-                "(facet_id, signal_strength, direction, source_type, raw_excerpt, message_id, created_at) "
+                "INSERT OR IGNORE INTO observations "
+                "(facet_id, signal_strength, extracted_signal, source_type, content, source_ref, created_at) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (o["facet_id"], o["signal_strength"], o["direction"],
-                 "message", "[synthetic demo]", o.get("message_id", ""), o.get("extracted_at", now_iso)),
+                (o["facet_id"], o["signal_strength"], o.get("direction"),
+                 "message", "[synthetic demo]", source_ref, o.get("extracted_at", now_iso)),
             )
 
         # hypotheses
         for h in seed.get("hypotheses", []):
             db.execute(
-                "INSERT OR REPLACE INTO hypotheses "
-                "(id, hypothesis, status, confidence, supporting_observations, created_at, updated_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (h["id"], h["body"], "active", h["confidence"],
+                "INSERT INTO hypotheses "
+                "(hypothesis, status, confidence, supporting_observations, created_at, updated_at) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                (h["body"], "active", h["confidence"],
                  json.dumps(h.get("facets", [])), now_iso, now_iso),
             )
 
@@ -621,9 +447,10 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
             )
             if rel_type:
                 db.execute(
-                    "INSERT INTO entity_relations (entity_id, relation_type, dynamic, sentiment, updated_at) "
-                    "VALUES (?, ?, ?, ?, ?)",
-                    (cur.lastrowid, rel_type, dynamic, sentiment, now_iso),
+                    "INSERT OR IGNORE INTO entity_relations "
+                    "(entity_id, relation_type, dynamic, sentiment, source_ref, updated_at) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (cur.lastrowid, rel_type, dynamic, sentiment, f"demo-entity-{cur.lastrowid}", now_iso),
                 )
 
         # demo episodes
@@ -673,11 +500,12 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
              "Subject explicitly prioritized completeness over meeting external deadline.",
              "message", 0.74, '["Project Beta"]'),
         ]
-        for etype, content, stype, conf, entity_names in demo_episodes:
+        for i, (etype, content, stype, conf, entity_names) in enumerate(demo_episodes):
             db.execute(
-                "INSERT INTO episodes (episode_type, content, source_type, confidence, occurred_at, extracted_at, entity_names, active) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (etype, content, stype, conf, now_iso, now_iso, entity_names, 1),
+                "INSERT OR IGNORE INTO episodes "
+                "(episode_type, content, source_type, source_ref, confidence, occurred_at, extracted_at, entity_names, active) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (etype, content, stype, f"demo-ep-{i:03d}", conf, now_iso, now_iso, entity_names, 1),
             )
 
         # demo decisions
@@ -704,11 +532,12 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
              "work", "high", '["temporal.planning_horizon"]',
              "Working backward from future states is the stated default planning mode."),
         ]
-        for decision, domain, direction, facet_ids, context in demo_decisions:
+        for i, (decision, domain, direction, facet_ids, context) in enumerate(demo_decisions):
             db.execute(
-                "INSERT INTO decisions (decision, domain, direction, facet_ids, decided_at, extracted_at, context) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (decision, domain, direction, facet_ids, now_iso, now_iso, context),
+                "INSERT OR IGNORE INTO decisions "
+                "(decision, domain, direction, facet_ids, source_type, source_ref, decided_at, extracted_at, context) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (decision, domain, direction, facet_ids, "demo", f"demo-dec-{i:03d}", now_iso, now_iso, context),
             )
 
         # demo checkin_exchanges
