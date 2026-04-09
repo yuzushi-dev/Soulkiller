@@ -225,6 +225,12 @@ def build(out_dir: Path) -> None:
     out_path.write_text(html_out, encoding="utf-8")
     print(f"Built: {out_path}  ({out_path.stat().st_size // 1024} KB)")
 
+    favicon_src = ROOT / "docs" / "soulkiller.svg"
+    if favicon_src.exists():
+        import shutil
+        shutil.copy(favicon_src, out_dir / "favicon.svg")
+        print(f"Copied: {out_dir / 'favicon.svg'}")
+
 
 def _entities(db: sqlite3.Connection) -> list[dict]:
     entities = safe_query(db,

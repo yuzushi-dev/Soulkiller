@@ -18,7 +18,7 @@ from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -71,6 +71,16 @@ def safe_query(db: sqlite3.Connection, sql: str, params: tuple = ()) -> list[dic
 @app.get("/")
 def serve_ui() -> HTMLResponse:
     return HTMLResponse(HTML_PATH.read_text())
+
+
+FAVICON_PATH = SCRIPT_DIR.parents[2] / "docs" / "soulkiller.svg"
+
+
+@app.get("/favicon.svg")
+def serve_favicon() -> Response:
+    if FAVICON_PATH.exists():
+        return Response(FAVICON_PATH.read_bytes(), media_type="image/svg+xml")
+    return Response(status_code=404)
 
 
 # ── Health ────────────────────────────────────────────────────────────────────
