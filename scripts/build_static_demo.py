@@ -227,9 +227,18 @@ def build(out_dir: Path) -> None:
 
     favicon_src = ROOT / "docs" / "soulkiller.svg"
     if favicon_src.exists():
-        import shutil
+        import base64, shutil
         shutil.copy(favicon_src, out_dir / "favicon.svg")
-        print(f"Copied: {out_dir / 'favicon.svg'}")
+        b64 = base64.b64encode(favicon_src.read_bytes()).decode()
+        data_uri = f"data:image/svg+xml;base64,{b64}"
+        html_out = html_out.replace(
+            '<link rel="icon" type="image/svg+xml" href="favicon.svg">',
+            f'<link rel="icon" type="image/svg+xml" href="{data_uri}">',
+            1,
+        )
+        # re-write after favicon inline
+        out_path.write_text(html_out, encoding="utf-8")
+        print(f"Inlined favicon + copied: {out_dir / 'favicon.svg'}")
 
 
 def _entities(db: sqlite3.Connection) -> list[dict]:
