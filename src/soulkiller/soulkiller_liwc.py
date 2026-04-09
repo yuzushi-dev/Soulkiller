@@ -10,6 +10,7 @@ Usage:
   python3 soulkiller_liwc.py [--period YYYY-WW] [--all] [--dry-run]
 """
 from __future__ import annotations
+import os
 import re
 import json
 import math
@@ -20,7 +21,7 @@ from typing import Any
 from lib.log import info, warn
 
 SCRIPT = "soulkiller_liwc"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 SUBJECT_FROM_ID = "demo-subject"
 
 

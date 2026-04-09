@@ -24,8 +24,8 @@ from lib.log import info, warn, error
 
 SCRIPT = "soulkiller_voicenote_transcriber"
 MEDIA_DIR = Path(__file__).resolve().parents[2] / "media" / "inbound"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
-STATE_FILE = Path(__file__).resolve().parents[1] / "soulkiller" / "voicenote-transcriber-state.json"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
+STATE_FILE = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "voicenote-transcriber-state.json"
 
 WHISPER_MODEL = "tiny"
 WHISPER_LANGUAGE = "it"

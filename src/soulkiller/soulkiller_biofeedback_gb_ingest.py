@@ -9,6 +9,7 @@ Usage:
   python3 soulkiller_biofeedback_gb_ingest.py [--date YYYY-MM-DD] [--dry-run]
 """
 from __future__ import annotations
+import os
 
 import argparse
 import sys
@@ -20,7 +21,7 @@ from lib.log import info, warn, error
 
 SCRIPT     = "soulkiller_biofeedback_gb_ingest"
 SYNC_DB    = Path(__file__).resolve().parents[2] / "media" / "gadgetbridge_sync" / "Gadgetbridge.db"
-STATE_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "gb_last_mtime.txt"
+STATE_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "gb_last_mtime.txt"
 
 
 def already_processed() -> bool:

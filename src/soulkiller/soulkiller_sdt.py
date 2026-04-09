@@ -10,6 +10,7 @@ Usage:
   python3 soulkiller_sdt.py [--model ...] [--period YYYY-MM] [--dry-run]
 """
 from __future__ import annotations
+import os
 
 import json, http.client, re, urllib.parse
 from datetime import datetime, timezone
@@ -21,7 +22,7 @@ from lib.log import info, warn
 from soulkiller_run_guard import should_skip, mark_ran
 
 SCRIPT = "soulkiller_sdt"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 DEFAULT_MODEL = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
 LLM_TIMEOUT = 300
 SUBJECT_FROM_ID = "demo-subject"

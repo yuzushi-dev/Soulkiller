@@ -13,6 +13,7 @@ State file: soulkiller/entity-extractor-state.json
 """
 
 from __future__ import annotations
+import os
 
 import json
 import http.client
@@ -30,8 +31,8 @@ SCRIPT = "soulkiller_entity_extractor"
 LLM_TIMEOUT_SECONDS = 150
 DEFAULT_MODEL = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
 BATCH_SIZE = 10          # inbox messages per LLM call
-STATE_FILE = Path(__file__).resolve().parents[1] / "soulkiller" / "entity-extractor-state.json"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+STATE_FILE = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "entity-extractor-state.json"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 
 
 # ---------------------------------------------------------------------------

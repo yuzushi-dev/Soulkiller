@@ -12,13 +12,14 @@ Outputs JSON summary for cron/alerting.
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SCRIPT = "soulkiller_healthcheck"
-SOULKILLER_DIR = Path(__file__).resolve().parents[1] / "soulkiller"
+SOULKILLER_DIR = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller"))
 DB_PATH = SOULKILLER_DIR / "soulkiller.db"
 PROFILE_PATH = SOULKILLER_DIR / "PROFILE.md"
 

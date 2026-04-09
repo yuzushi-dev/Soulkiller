@@ -14,6 +14,7 @@ Falls back to legacy 5-topic scorer if Soulkiller DB is unavailable.
 """
 
 from __future__ import annotations
+import os
 
 import argparse
 import json

@@ -20,6 +20,7 @@ State file: soulkiller/budget-bridge-state.json
 """
 
 from __future__ import annotations
+import os
 
 import csv
 import glob
@@ -40,8 +41,8 @@ LLM_TIMEOUT_SECONDS = 120
 DEFAULT_MODEL = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
 
 EXPORTS_DIR = Path(__file__).resolve().parents[1] / "deploy" / "actual-budget" / "exports"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
-STATE_FILE = Path(__file__).resolve().parents[1] / "soulkiller" / "budget-bridge-state.json"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
+STATE_FILE = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "budget-bridge-state.json"
 
 # Batch size for LLM classification
 CLASSIFY_BATCH = 40

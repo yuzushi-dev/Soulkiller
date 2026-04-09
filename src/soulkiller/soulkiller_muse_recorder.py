@@ -10,6 +10,7 @@ Usage:
   python3 soulkiller_muse_recorder.py --list-sessions
 """
 from __future__ import annotations
+import os
 
 import argparse
 import math
@@ -311,7 +312,7 @@ class MuseRecorder:
 
 def _get_db():
     import sqlite3
-    db_path = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+    db_path = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
     db = sqlite3.connect(str(db_path))
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA journal_mode=WAL")

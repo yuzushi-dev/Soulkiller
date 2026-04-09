@@ -16,6 +16,7 @@ Usage:
   python3 soulkiller_narrative.py [--model ...] [--dry-run]
 """
 from __future__ import annotations
+import os
 
 import json, http.client, re, urllib.parse
 from datetime import datetime, timezone
@@ -27,7 +28,7 @@ from lib.log import info, warn
 from soulkiller_run_guard import should_skip, mark_ran
 
 SCRIPT = "soulkiller_narrative"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 DEFAULT_MODEL = "openrouter/nvidia/nemotron-3-super-120b-a12b:free"
 LLM_TIMEOUT = 300
 

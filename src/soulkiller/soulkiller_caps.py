@@ -10,6 +10,7 @@ Usage:
   python3 soulkiller_caps.py [--model ...] [--dry-run] [--sample N]
 """
 from __future__ import annotations
+import os
 
 import json, http.client, re, urllib.parse
 from datetime import datetime, timezone
@@ -20,7 +21,7 @@ from lib.config import load_nanobot_config
 from lib.log import info, warn
 
 SCRIPT = "soulkiller_caps"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 DEFAULT_MODEL = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
 LLM_TIMEOUT = 600
 SAMPLE_LIMIT = 12

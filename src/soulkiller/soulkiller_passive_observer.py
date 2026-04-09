@@ -23,7 +23,7 @@ from lib.runtime_client import RuntimeClient
 
 SCRIPT = "soulkiller_passive_observer"
 DEFAULT_RELATIONAL_AGENT_IDS: list[str] = []  # set via SOULKILLER_RELATIONAL_AGENT env var
-STATE_FILE = Path(__file__).resolve().parents[1] / "soulkiller" / "passive-observer-state.json"
+STATE_FILE = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "passive-observer-state.json"
 LOOKBACK_HOURS = 12
 MAX_MESSAGES_PER_RUN = 20
 MAX_MESSAGES_PER_SESSION = 10
@@ -357,7 +357,7 @@ def check_caps_predictions(session_text: str) -> int:
     """Check active CAPS predictions against session content; update confirmations/disconfirmations (IMP-07)."""
     import re
     import sqlite3
-    DB_PATH_LOCAL = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+    DB_PATH_LOCAL = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
     db = sqlite3.connect(str(DB_PATH_LOCAL))
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA journal_mode=WAL")

@@ -17,6 +17,7 @@ Usage:
 """
 
 from __future__ import annotations
+import os
 
 import json
 import http.client
@@ -30,8 +31,8 @@ from lib.config import load_nanobot_config
 from lib.log import info, warn
 
 SCRIPT = "soulkiller_decisions"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
-STATE_FILE = Path(__file__).resolve().parents[1] / "soulkiller" / "decisions-state.json"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
+STATE_FILE = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "decisions-state.json"
 DEFAULT_MODEL = "openrouter/meta-llama/llama-3.3-70b-instruct:free"
 LLM_TIMEOUT_SECONDS = 90
 BATCH_SIZE = 15

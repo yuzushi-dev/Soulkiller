@@ -6,6 +6,7 @@ Database at: workspace/soulkiller/soulkiller.db
 """
 
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -17,7 +18,7 @@ from typing import Any
 from lib.log import info, warn, error
 
 SCRIPT = "soulkiller_db"
-DB_DIR = Path(__file__).resolve().parents[1] / "soulkiller"
+DB_DIR = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller"))
 DB_PATH = DB_DIR / "soulkiller.db"
 
 # ── Schema ──────────────────────────────────────────────────────────────────
@@ -1526,7 +1527,7 @@ def main() -> int:
             row_id = record_checkin(args.facet, args.question, args.message_id, conn)
             conn.commit()
             # Write signal file for hook-based follow-up
-            signal_path = Path(__file__).resolve().parents[1] / "soulkiller" / "pending-checkin.json"
+            signal_path = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "pending-checkin.json"
             signal_path.write_text(json.dumps({
                 "exchange_id": row_id,
                 "facet_id": args.facet,

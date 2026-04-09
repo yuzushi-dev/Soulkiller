@@ -17,6 +17,7 @@ Usage:
 """
 
 from __future__ import annotations
+import os
 
 import json
 import re
@@ -29,7 +30,7 @@ from typing import Any
 from lib.log import info, warn
 
 SCRIPT = "soulkiller_memory"
-DB_PATH = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 DEFAULT_PLATFORM = "telegram"
 DEFAULT_CHAT_ID = "demo-subject"
 

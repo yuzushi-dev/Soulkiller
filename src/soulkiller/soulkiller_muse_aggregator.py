@@ -149,7 +149,7 @@ def aggregate_daily_eeg(db, date_str: str, dry_run: bool = False) -> int:
 
 def _get_db():
     import sqlite3
-    db_path = Path(__file__).resolve().parents[1] / "soulkiller" / "soulkiller.db"
+    db_path = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
     db = sqlite3.connect(str(db_path))
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA journal_mode=WAL")
