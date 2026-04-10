@@ -98,6 +98,67 @@ def _complete_ollama(model: str, prompt: str) -> str:
     return data.get("response", "")
 
 
+# ── OpenRouter (OpenAI-compatible) ────────────────────────────────────────────
+
+def _complete_openrouter(model: str, prompt: str) -> str:
+    try:
+        import openai  # type: ignore[import]
+    except ImportError:
+        raise RuntimeError(
+            "openai SDK not installed. Run: pip install openai\n"
+            "Then set OPENROUTER_API_KEY in your environment or .env file."
+        ) from None
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "OPENROUTER_API_KEY is not set. Add it to your .env file."
+        )
+
+    # Strip "openrouter/" prefix if present in model name
+    model_name = model.removeprefix("openrouter/")
+
+    client = openai.OpenAI(
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
+    )
+    resp = client.chat.completions.create(
+        model=model_name,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return resp.choices[0].message.content or ""
+
+
+# ── NVIDIA NIM (OpenAI-compatible) ────────────────────────────────────────────
+
+def _complete_nvidia(model: str, prompt: str) -> str:
+    try:
+        import openai  # type: ignore[import]
+    except ImportError:
+        raise RuntimeError(
+            "openai SDK not installed. Run: pip install openai\n"
+            "Then set NVIDIA_NIM_API_KEY in your environment or .env file."
+        ) from None
+
+    api_key = os.environ.get("NVIDIA_NIM_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "NVIDIA_NIM_API_KEY is not set. Add it to your .env file."
+        )
+
+    model_name = model.removeprefix("nvidia/")
+
+    client = openai.OpenAI(
+        api_key=api_key,
+        base_url="https://integrate.api.nvidia.com/v1",
+    )
+    resp = client.chat.completions.create(
+        model=model_name,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return resp.choices[0].message.content or ""
+
+
 # ── OpenClaw (delegates to CLI) ────────────────────────────────────────────────
 
 def _complete_openclaw(model: str, prompt: str) -> str:
@@ -105,15 +166,14 @@ def _complete_openclaw(model: str, prompt: str) -> str:
 
     bin_path = os.environ.get("OPENCLAW_BIN", "openclaw")
     agent = os.environ.get("SOULKILLER_RELATIONAL_AGENT", "")
-    cmd = [bin_path, "agent", "run"]
+    # openclaw agent [--agent <id>] --message <text> --json
+    cmd = [bin_path, "agent"]
     if agent:
         cmd += ["--agent", agent]
-    if model:
-        cmd += ["--model", model]
     cmd += ["--message", prompt, "--json"]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
     except FileNotFoundError:
         raise RuntimeError(
             f"OpenClaw binary not found: '{bin_path}'. "
@@ -121,11 +181,13 @@ def _complete_openclaw(model: str, prompt: str) -> str:
         ) from None
     if result.returncode != 0:
         raise RuntimeError(
-            f"openclaw agent run failed (exit {result.returncode}): "
+            f"openclaw agent failed (exit {result.returncode}): "
             f"{(result.stderr or result.stdout).strip()[:200]}"
         )
     try:
-        return json.loads(result.stdout).get("response", result.stdout.strip())
+        data = json.loads(result.stdout)
+        # OpenClaw JSON response: {"response": "..."} or {"message": "..."}
+        return data.get("response") or data.get("message") or result.stdout.strip()
     except json.JSONDecodeError:
         return result.stdout.strip()
 
@@ -155,11 +217,15 @@ class ProviderLLMClient:
             return _complete_anthropic(self.model, prompt)
         if provider in ("openai", "openai-compatible"):
             return _complete_openai(self.model, prompt)
+        if provider == "openrouter":
+            return _complete_openrouter(self.model, prompt)
+        if provider in ("nvidia", "nvidia-nim"):
+            return _complete_nvidia(self.model, prompt)
         if provider == "openclaw":
             return _complete_openclaw(self.model, prompt)
 
         raise RuntimeError(
             f"Unknown provider '{provider}' for model='{self.model}'.\n"
-            f"Set SOULKILLER_PROVIDER to one of: ollama, anthropic, openai, openclaw.\n"
+            f"Set SOULKILLER_PROVIDER to one of: ollama, anthropic, openai, openrouter, nvidia, openclaw.\n"
             f"See docs/ADAPTERS.md for setup instructions."
         )

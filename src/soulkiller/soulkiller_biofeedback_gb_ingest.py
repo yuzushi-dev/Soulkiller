@@ -20,7 +20,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.log import info, warn, error
 
 SCRIPT     = "soulkiller_biofeedback_gb_ingest"
-SYNC_DB    = Path(__file__).resolve().parents[2] / "media" / "gadgetbridge_sync" / "Gadgetbridge.db"
+SYNC_DB    = Path(
+    os.environ.get("GADGETBRIDGE_DB_PATH")
+    or str(Path(__file__).resolve().parents[2] / "media" / "gadgetbridge_sync" / "Gadgetbridge.db")
+)
 STATE_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "gb_last_mtime.txt"
 
 

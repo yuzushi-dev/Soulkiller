@@ -1,0 +1,31 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bladeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff2a2a"></stop>
+      <stop offset="100%" stop-color="#ff6a6a"></stop>
+    </linearGradient>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="64" height="64" rx="12" fill="#0d0d0f"></rect>
+
+  <!-- handle -->
+  <rect x="6" y="28" width="20" height="8" rx="2" fill="#2a2a2e"></rect>
+
+  <!-- blade core -->
+  <rect x="24" y="26" width="30" height="12" rx="2" fill="url(#bladeGlow)" filter="url(#glow)"></rect>
+
+  <!-- energy pattern -->
+  <polyline points="26,32 30,30 34,34 38,29 42,33 46,30 50,32" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"></polyline>
+
+  <!-- tip -->
+  <polygon points="54,26 60,32 54,38" fill="#2a2a2e"></polygon>
+</svg>

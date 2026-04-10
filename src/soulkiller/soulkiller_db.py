@@ -590,11 +590,26 @@ def categorize_hour(hour: int) -> str:
 
 def get_db(path: Path | None = None) -> sqlite3.Connection:
     db_path = path or DB_PATH
+    already_exists = db_path.exists()
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    # Guard: if the DB existed before this call but observations is empty,
+    # something went wrong (schema-only recreation). Log a critical warning.
+    if already_exists:
+        try:
+            n = conn.execute("SELECT COUNT(*) FROM observations").fetchone()[0]
+            if n == 0:
+                import sys
+                print(
+                    f"[SOULKILLER CRITICAL] DB at {db_path} has 0 observations — "
+                    "possible empty-recreation. Check data integrity before proceeding.",
+                    file=sys.stderr,
+                )
+        except Exception:
+            pass  # table may not exist yet (fresh init)
     return conn
 
 

@@ -847,7 +847,16 @@ def _call_llm(prompt: str, model: str) -> str:
     config = load_nanobot_config()
     cfg = (config.get("providers") or {}).get(provider)
     if not cfg:
-        raise ValueError(f"Provider {provider} not found")
+        # Fall back to ProviderLLMClient (supports ollama/anthropic/openai/nvidia/openrouter)
+        try:
+            import sys as _sys
+            import os as _os
+            _sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+            from lib.provider_llm_client import ProviderLLMClient
+            client = ProviderLLMClient()
+            return client.complete(prompt)
+        except Exception as exc:
+            raise ValueError(f"Provider {provider} not found and ProviderLLMClient failed: {exc}") from exc
 
     parsed = urllib.parse.urlparse(cfg["apiBase"])
     host = parsed.netloc

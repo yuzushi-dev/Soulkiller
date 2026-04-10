@@ -54,6 +54,8 @@ CATEGORY_DISPLAY: dict[str, str] = {
 
 
 def load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 

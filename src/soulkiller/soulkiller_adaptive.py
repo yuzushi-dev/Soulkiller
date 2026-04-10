@@ -20,6 +20,7 @@ State file: workspace/memory/soulkiller_adaptive_state.json
 from __future__ import annotations
 
 import json
+import os
 import math
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,6 +61,9 @@ _PHASE_CRITERIA = {
 # ── State I/O ──────────────────────────────────────────────────────────────────
 
 def _state_path() -> Path:
+    data_dir = os.environ.get("SOULKILLER_DATA_DIR")
+    if data_dir:
+        return Path(data_dir) / "soulkiller-adaptive-state.json"
     return Path.home() / ".openclaw/workspace/memory/soulkiller_adaptive_state.json"
 
 

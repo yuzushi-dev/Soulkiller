@@ -28,7 +28,7 @@ from lib.log import info, warn
 from lib.openclaw_client import OpenClawClient
 
 SCRIPT = "soulkiller_daily_stress"
-DB_PATH = Path(os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
+DB_PATH = Path(_os.environ.get("SOULKILLER_DATA_DIR") or str(Path(__file__).resolve().parents[1] / "soulkiller")) / "soulkiller.db"
 APP_CONFIG = get_config()
 SUBJECT_FROM_ID = "demo-subject"
 BASELINE_DAYS = 14
