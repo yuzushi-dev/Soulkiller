@@ -47,6 +47,9 @@ _site/
 # Generated demo outputs (re-created by soulkiller-demo)
 demo/generated/
 
+# Local development guidance (private, not for public repo)
+CLAUDE.md
+
 # Internal and non-essential documents (not needed to spin up or use the project)
 docs/SANITIZATION_STATUS.md
 docs/history/
