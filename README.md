@@ -68,6 +68,8 @@ For fifty years, her consciousness drifted beyond the Blackwall, neither dead no
 
 This project takes the name, the philosophical tension, and nothing else.
 
+Name note: `Soulkiller` is used here as a project codename and cultural reference. It is not intended to imply affiliation with or endorsement by CD PROJEKT RED, `Cyberpunk 2077`, or related rights holders.
+
 **Soulkiller** is a framework for modeling how a person thinks, reacts, decides, and adapts, not in a single session, but over time. Built on cognitive psychology, not fiction. Grounded in UX, not surveillance.
 
 Not immortality. Not extraction. **A reflective architecture.**
