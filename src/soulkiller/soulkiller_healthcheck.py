@@ -90,34 +90,41 @@ def check_pipeline_activity() -> dict:
 
         # Check thresholds (FAST: just compare ISO strings)
         now = datetime.now(timezone.utc)
-        
-        # Extractor: should create observations within 24h of inbox activity
-        if last_obs != "never":
+
+        # Extractor: stale only if inbox has messages newer than last observation by >24h
+        # (i.e., there are unprocessed messages sitting in the queue)
+        if last_obs != "never" and last_inbox_at != "never":
             try:
                 obs_dt = datetime.fromisoformat(last_obs_at.replace("Z", "+00:00"))
+                inbox_dt = datetime.fromisoformat(last_inbox_at.replace("Z", "+00:00"))
                 gap_hours = (now - obs_dt).total_seconds() / 3600
                 result["hours_since_observation"] = round(gap_hours, 1)
-                if gap_hours > 24:
-                    result["extractor_status"] = "stale"
-                else:
-                    result["extractor_status"] = "ok"
+                lag = (obs_dt - inbox_dt).total_seconds() / 3600
+                result["extractor_status"] = "stale" if lag < -24 else "ok"
             except (ValueError, TypeError):
                 result["extractor_status"] = "unknown"
+        elif last_obs != "never":
+            obs_dt = datetime.fromisoformat(last_obs_at.replace("Z", "+00:00"))
+            result["hours_since_observation"] = round((now - obs_dt).total_seconds() / 3600, 1)
+            result["extractor_status"] = "ok"
         else:
             result["extractor_status"] = "no_data"
 
-        # Synthesizer: should update traits within 48h
-        if last_synthesis != "never":
+        # Synthesizer: stale only if observations are newer than last synthesis by >48h
+        if last_synthesis != "never" and last_obs_at != "never":
             try:
                 synth_dt = datetime.fromisoformat(last_synthesis_at.replace("Z", "+00:00"))
+                obs_dt = datetime.fromisoformat(last_obs_at.replace("Z", "+00:00"))
                 gap_hours = (now - synth_dt).total_seconds() / 3600
                 result["hours_since_synthesis"] = round(gap_hours, 1)
-                if gap_hours > 48:
-                    result["synthesizer_status"] = "stale"
-                else:
-                    result["synthesizer_status"] = "ok"
+                unsynthesized_hours = (obs_dt - synth_dt).total_seconds() / 3600
+                result["synthesizer_status"] = "stale" if unsynthesized_hours > 48 else "ok"
             except (ValueError, TypeError):
                 result["synthesizer_status"] = "unknown"
+        elif last_synthesis != "never":
+            synth_dt = datetime.fromisoformat(last_synthesis_at.replace("Z", "+00:00"))
+            result["hours_since_synthesis"] = round((now - synth_dt).total_seconds() / 3600, 1)
+            result["synthesizer_status"] = "ok"
         else:
             result["synthesizer_status"] = "no_data"
 
