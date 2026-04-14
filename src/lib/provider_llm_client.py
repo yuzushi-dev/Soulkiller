@@ -7,6 +7,7 @@ from the model name). Supported providers:
   openai      — requires: pip install openai     + OPENAI_API_KEY
   ollama      — no extra deps (stdlib urllib)    + Ollama running locally
   openclaw    — delegates to the openclaw CLI    + OPENCLAW_BIN in PATH
+  openrouter  — uses OpenRouter API (OpenAI-compatible) + OPENROUTER_API_KEY
 
 Set in .env:
 
@@ -27,6 +28,9 @@ from typing import Any
 
 def _infer_provider(model: str) -> str:
     m = model.lower()
+    # OpenRouter first (explicit prefix)
+    if m.startswith("openrouter/"):
+        return "openrouter"
     # Local-first: common Ollama model prefixes
     if m.startswith(("llama", "mistral", "gemma", "phi", "qwen", "deepseek",
                       "codellama", "wizardlm", "dolphin", "nous")):
@@ -98,7 +102,8 @@ def _complete_ollama(model: str, prompt: str) -> str:
     return data.get("response", "")
 
 
-# ── OpenRouter (OpenAI-compatible) ────────────────────────────────────────────
+# ── OpenRouter (OpenAI-compatible API) ─────────────────────────────────────────
+
 
 def _complete_openrouter(model: str, prompt: str) -> str:
     try:
