@@ -47,7 +47,7 @@ _site/
 # Generated demo outputs (re-created by soulkiller-demo)
 demo/generated/
 
-# Local development guidance (private, not for public repo)
+# Local development guidance (private)
 CLAUDE.md
 
 # Internal and non-essential documents (not needed to spin up or use the project)
