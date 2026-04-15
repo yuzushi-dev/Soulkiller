@@ -90,6 +90,52 @@ def mark_extracted(db, exchange_ids: list[int]) -> None:
     db.commit()
 
 
+def load_recent_exchanges(db, exclude_ids: list[int], limit: int = 4) -> list[dict]:
+    """Fetch recent completed exchanges to provide context in the extraction prompt.
+
+    Returns exchanges in chronological order (oldest first) so the LLM sees
+    the subject's pattern building up naturally.
+    """
+    if exclude_ids:
+        placeholders = ",".join("?" * len(exclude_ids))
+        rows = db.execute(
+            f"""SELECT question_text, reply_text, asked_at
+                FROM checkin_exchanges
+                WHERE reply_text IS NOT NULL
+                  AND observations_extracted = 1
+                  AND id NOT IN ({placeholders})
+                  AND asked_at >= datetime('now', '-30 days')
+                ORDER BY asked_at DESC
+                LIMIT ?""",
+            (*exclude_ids, limit),
+        ).fetchall()
+    else:
+        rows = db.execute(
+            """SELECT question_text, reply_text, asked_at
+               FROM checkin_exchanges
+               WHERE reply_text IS NOT NULL
+                 AND observations_extracted = 1
+                 AND asked_at >= datetime('now', '-30 days')
+               ORDER BY asked_at DESC
+               LIMIT ?""",
+            (limit,),
+        ).fetchall()
+    return list(reversed([dict(r) for r in rows]))
+
+
+def _build_context_block(recent: list[dict]) -> str:
+    """Format recent exchanges as a context preamble for the extraction prompt."""
+    if not recent:
+        return ""
+    lines = ["Recent subject exchanges (for calibration context — do not re-extract):"]
+    for ex in recent:
+        q = (ex.get("question_text") or "")[:120].strip()
+        a = (ex.get("reply_text") or "")[:120].strip()
+        lines.append(f'• "{q}" → "{a}"')
+    return "\n".join(lines) + "\n\n"
+
+
+
 # ---------------------------------------------------------------------------
 # LLM
 # ---------------------------------------------------------------------------
@@ -180,7 +226,8 @@ Rules for evidence:
 """
 
 
-def build_prompt(exchanges: list[dict]) -> str:
+def build_prompt(exchanges: list[dict], recent: list[dict] | None = None) -> str:
+    context = _build_context_block(recent or [])
     lines = []
     for ex in exchanges:
         spectrum = f"{ex.get('spectrum_low', '?')} ← → {ex.get('spectrum_high', '?')}"
@@ -191,7 +238,7 @@ def build_prompt(exchanges: list[dict]) -> str:
             f"question: {ex['question_text']}\n"
             f"reply: {ex['reply_text']}\n"
         )
-    return EXTRACT_PROMPT.format(exchanges="\n---\n".join(lines))
+    return context + EXTRACT_PROMPT.format(exchanges="\n---\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -213,7 +260,9 @@ def run(model: str = DEFAULT_MODEL, dry_run: bool = False, limit: int = 70) -> N
 
         for i in range(0, len(pending), BATCH_SIZE):
             batch = pending[i:i + BATCH_SIZE]
-            prompt = build_prompt(batch)
+            batch_ids_for_context = [ex["id"] for ex in batch]
+            recent = load_recent_exchanges(db, exclude_ids=batch_ids_for_context)
+            prompt = build_prompt(batch, recent=recent)
 
             if dry_run:
                 for ex in batch:
