@@ -198,7 +198,7 @@ def build_prompt(exchanges: list[dict]) -> str:
 # Main
 # ---------------------------------------------------------------------------
 
-def run(model: str = DEFAULT_MODEL, dry_run: bool = False, limit: int = 50) -> None:
+def run(model: str = DEFAULT_MODEL, dry_run: bool = False, limit: int = 70) -> None:
     db = get_db()
     try:
         pending = load_pending(db, limit)
@@ -273,7 +273,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Soulkiller Reply Extractor")
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--limit", type=int, default=50)
+    parser.add_argument("--limit", type=int, default=70)
     args = parser.parse_args()
     run(model=args.model, dry_run=args.dry_run, limit=args.limit)
     return 0
