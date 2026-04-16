@@ -773,6 +773,107 @@ def _write_demo_jobs(output_dir: Path) -> None:
 
 # ── Main runner ───────────────────────────────────────────────────────────────
 
+def _write_demo_amber_db(output_dir: Path) -> None:
+    """Write a seeded amber-operational.sqlite for demo purposes.
+
+    Contains 12 fictional operational memory items covering all memory_type
+    values. Subject is always 'demo-subject'. No real data involved.
+    Skipped silently if the amber package is not available.
+    """
+    try:
+        import sys as _sys
+        _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+        if _amber_root.exists() and str(_amber_root) not in _sys.path:
+            _sys.path.insert(0, str(_amber_root))
+        from amber.db import AmberDB
+    except ImportError:
+        return
+
+    db_path = output_dir / "amber-operational.sqlite"
+    db_path.unlink(missing_ok=True)
+    db = AmberDB(db_path=db_path)
+    db.initialize()
+
+    now = "2026-04-16T10:00:00+00:00"
+    # (id, memory_type, title, content, salience, confidence, origin_type, review_status)
+    items = [
+        ("mem_demo_001", "constraint",
+         "Avoids asking for help",
+         "Strongly prefers independent problem-solving. Rarely initiates requests for "
+         "assistance even when external input would accelerate the outcome.",
+         0.82, 0.88, "confirmed", "confirmed"),
+        ("mem_demo_002", "constraint",
+         "High cognitive cost before decisions",
+         "Extensive information-gathering before committing. Front-loads cognitive cost "
+         "to reduce correction cycles - cost is speed, benefit is consistency.",
+         0.77, 0.84, "confirmed", "confirmed"),
+        ("mem_demo_003", "priority",
+         "Prefers async written communication",
+         "Low verbosity combined with high directness: preference for concise written "
+         "exchanges over real-time discussion.",
+         0.70, 0.79, "confirmed", "confirmed"),
+        ("mem_demo_004", "open_loop",
+         "Conflict style unresolved",
+         "Conflict behavior sits near center (confidence 0.47). Direct communication and "
+         "firm boundaries coexist with some interpersonal avoidance. More signal needed.",
+         0.55, 0.47, "inferred", "pending"),
+        ("mem_demo_005", "open_loop",
+         "Long-horizon planning vs. execution gap",
+         "Planning horizon is high but whether it consistently translates to execution "
+         "without urgency pressure is unresolved.",
+         0.60, 0.55, "inferred", "pending"),
+        ("mem_demo_006", "recent_decision",
+         "Chose depth over breadth on Project Alpha",
+         "Declined to expand scope to Project Beta this sprint. Consistent with deliberate "
+         "decision-making and focus on output quality over throughput.",
+         0.68, 0.74, "observed", "confirmed"),
+        ("mem_demo_007", "relationship_note",
+         "Collaborator A: trusted, low-friction",
+         "High mention frequency and positive sentiment. Interaction pattern suggests "
+         "established trust and efficient communication.",
+         0.65, 0.72, "observed", "confirmed"),
+        ("mem_demo_008", "contradiction",
+         "Autonomy drive vs. stress under isolation",
+         "High autonomy drive creates productive independence but correlates with elevated "
+         "stress response during prolonged solo problem-solving.",
+         0.72, 0.68, "inferred", "confirmed"),
+        ("mem_demo_009", "interaction_rule",
+         "Lead with context, not questions",
+         "Low help-seeking and high directness: unsolicited clarifying questions are "
+         "poorly received. Provide structured context upfront.",
+         0.80, 0.85, "confirmed", "confirmed"),
+        ("mem_demo_010", "interaction_rule",
+         "Avoid redundant summaries",
+         "High information-processing efficiency. Repeating already-stated information "
+         "is experienced as noise, not reassurance.",
+         0.75, 0.82, "confirmed", "confirmed"),
+        ("mem_demo_011", "active_entity",
+         "Project Alpha",
+         "Primary active project. High mention frequency in recent sessions.",
+         0.70, 0.78, "observed", "confirmed"),
+        ("mem_demo_012", "active_entity",
+         "Collaborator B",
+         "Team-lead. Appears in decision and planning contexts. Professional relationship, "
+         "moderate trust.",
+         0.60, 0.65, "observed", "pending"),
+    ]
+
+    db.conn.executemany(
+        """
+        INSERT INTO operational_memory_items
+          (id, subject_id, memory_type, title, content, salience, confidence,
+           origin_type, source_system, status, review_status,
+           first_seen_at, last_seen_at, created_at, updated_at, metadata_json)
+        VALUES (?, 'demo-subject', ?, ?, ?, ?, ?, ?, 'soulkiller', 'active', ?,
+                ?, ?, ?, ?, '{}')
+        """,
+        [(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], now, now, now, now)
+         for r in items],
+    )
+    db.conn.commit()
+    db.close()
+
+
 def run_demo(output_dir: Path) -> dict:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -821,6 +922,7 @@ def run_demo(output_dir: Path) -> dict:
     )
     write_demo_console(output_dir, output_dir / DEMO_CONSOLE_FILENAME)
     _write_demo_db(output_dir, seed, observations)
+    _write_demo_amber_db(output_dir)
 
     return summary
 
