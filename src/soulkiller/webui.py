@@ -574,6 +574,40 @@ def api_biofeedback_summary() -> dict:
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+# ── Operational Memory ────────────────────────────────────────────────────────
+
+def _load_provider():
+    """Return a SoulkillerMemoryProvider backed by the active DB_PATH.
+
+    In OSS this is the demo DB (or SOULKILLER_DATA_DIR).
+    No external package required — reads hypotheses/traits/entities directly.
+    """
+    import sys as _sys
+    _lib = Path(__file__).resolve().parents[2] / "lib"
+    if _lib.exists() and str(_lib) not in _sys.path:
+        _sys.path.insert(0, str(_lib))
+    from lib.memory_context import SoulkillerMemoryProvider
+    return SoulkillerMemoryProvider(db=get_db())
+
+
+def _subject_id() -> str:
+    return _os.environ.get("SOULKILLER_SUBJECT_ID", "demo-subject")
+
+
+@app.get("/api/memory/provider/status")
+def api_memory_provider_status() -> dict:
+    try:
+        provider = _load_provider()
+        status = provider.health_check()
+        return {
+            "provider": status.provider_name,
+            "healthy": status.healthy,
+            "detail": status.detail,
+        }
+    except Exception as exc:
+        return {"provider": "error", "healthy": False, "detail": str(exc)}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Soulkiller Web UI")
     parser.add_argument("--port", type=int, default=8765)
