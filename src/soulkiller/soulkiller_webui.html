@@ -805,6 +805,15 @@
       <h1 class="page-title">Memory Context Inspector</h1>
       <p class="page-sub">Operational memory · debug bundle iniettato agli agenti</p>
 
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span class="alert-icon">◎</span>
+        <div style="font-size:13px;line-height:1.6">
+          <strong>What this does:</strong> Shows exactly what psychological context gets injected into an agent's prompt before it responds — confirmed behavioral hypotheses, high-confidence personality traits, active entities.<br>
+          <strong>How to use:</strong> Type a query that mimics what an agent would receive (e.g. <em>"subject is stressed, how should I respond"</em> or <em>"technical decision on a project"</em>), pick a role, press <strong>Inspect</strong>. Use the retrieval trace to see which sources were prioritized and why.<br>
+          <strong>When useful:</strong> debugging unexpected agent behavior · verifying the model reflects recent drift · checking which hypotheses dominate a given context.
+        </div>
+      </div>
+
       <div class="card" style="margin-bottom:16px">
         <div class="card-title">Provider</div>
         <div id="ctx-provider-status">—</div>
