@@ -14,7 +14,7 @@
 
 ---
 
-## Option A — Wizard (recommended)
+## Option A - Wizard (recommended)
 
 ```bash
 git clone https://github.com/yuzushi-dev/soulkiller
@@ -24,15 +24,15 @@ python install.py
 
 The wizard walks through 9 steps:
 
-1. Prerequisites check — Python, OpenClaw binary, version verification
-2. Subject configuration — name, ID slug, Telegram sender ID
-3. Runtime data directory — where the database, inbox, and portraits live
-4. OpenClaw configuration — binary path, home directory, hooks directory
-5. Check-in schedule — active hours and probe frequency
-6. Optional integrations — relational agent, Telegram, biofeedback
-7. Past-message backfill — import existing messages into the extraction inbox
-8. Configuration summary — review before committing
-9. Installation — writes files, compiles hooks, registers crons
+1. Prerequisites check - Python, OpenClaw binary, version verification
+2. Subject configuration - name, ID slug, Telegram sender ID
+3. Runtime data directory - where the database, inbox, and portraits live
+4. OpenClaw configuration - binary path, home directory, hooks directory
+5. Check-in schedule - active hours and probe frequency
+6. Optional integrations - relational agent, Telegram, biofeedback
+7. Past-message backfill - import existing messages into the extraction inbox
+8. Configuration summary - review before committing
+9. Installation - writes files, compiles hooks, registers crons
 
 **Dry run** (preview without writing anything):
 
@@ -42,7 +42,7 @@ python install.py --dry-run
 
 ---
 
-## Option B — Manual setup
+## Option B - Manual setup
 
 If you prefer to configure without the wizard, follow these steps.
 
@@ -76,7 +76,7 @@ Set `SOULKILLER_DATA_DIR` in `.env` to this path.
 Each hook is a TypeScript project. OpenClaw compiles it on registration.
 
 ```bash
-# Register with OpenClaw (OpenClaw compiles TypeScript internally — no npm step needed)
+# Register with OpenClaw (OpenClaw compiles TypeScript internally - no npm step needed)
 openclaw hooks enable soulkiller-capture \
   --path ./hooks/soulkiller-capture \
   --env SOULKILLER_SUBJECT_ID=<your-subject-id> \
@@ -91,7 +91,7 @@ openclaw hooks enable soulkiller-bootstrap \
 ### 5. Register cron jobs
 
 Replace `<schedule>` with your values. The `checkin-followup` cron has no
-fixed schedule — it is triggered on-demand by the capture hook.
+fixed schedule - it is triggered on-demand by the capture hook.
 
 ```bash
 PYTHON=$(which python3)
@@ -180,7 +180,7 @@ wc -l ~/.soulkiller/<subject-id>/inbox.jsonl
 
 The demo pipeline (`soulkiller-demo`) writes synthetic data into `demo/generated/soulkiller.db`.
 The live pipeline writes real data into `~/.soulkiller/<subject-id>/soulkiller.db`.
-These are separate files — the demo never touches your live database.
+These are separate files - the demo never touches your live database.
 
 To switch the webui from demo data to live data, change `SOULKILLER_DATA_DIR`:
 
@@ -224,4 +224,4 @@ process them on the next run.
 ```
 
 The `from` field must match `telegram:<SOULKILLER_SUBJECT_ID>` exactly.
-`message_id` values must be unique across the file — duplicates are skipped.
+`message_id` values must be unique across the file - duplicates are skipped.

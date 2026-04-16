@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller CAPS — Situation-Behavior Signatures (Mischel & Shoda 1995).
+"""Soulkiller CAPS - Situation-Behavior Signatures (Mischel & Shoda 1995).
 
 Sintetizza le firme "se-allora" (if-then) di the subject dai cluster contestuali
 e dai pattern osservati nel corpus. Salva in caps_signatures.
@@ -75,7 +75,7 @@ Cues: {situation_cues}
 Behavioral response: {behavioral_response}
 Emotional response: {emotional_response}
 
-Generate 2-3 TESTABLE behavioral predictions — specific observable behaviors that should appear
+Generate 2-3 TESTABLE behavioral predictions - specific observable behaviors that should appear
 in the subject's messages/sessions if this signature is active.
 
 Return JSON array:

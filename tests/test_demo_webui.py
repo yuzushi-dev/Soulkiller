@@ -23,8 +23,8 @@ def test_demo_webui_builds_console_from_demo_artifacts(tmp_path):
     summary = json.loads((tmp_path / "summary.json").read_text(encoding="utf-8"))
 
     assert summary["subject_name"] == "Demo Subject"
-    assert "# Soulkiller — Personality Model" in html
-    assert "# Portrait — Demo Subject" in html
+    assert "# Soulkiller - Personality Model" in html
+    assert "# Portrait - Demo Subject" in html
     assert "event_log.sample.jsonl" in html
     assert "delivery_log.sample.jsonl" in html
     assert "Top Confidence Facets" in html

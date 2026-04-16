@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Muse 2 EEG Aggregator — Sprint 3.
+"""Soulkiller Muse 2 EEG Aggregator - Sprint 3.
 
 Reads completed EEG sessions from the DB (stored by soulkiller_muse_recorder),
 computes daily aggregates, and writes them into biofeedback_readings so the

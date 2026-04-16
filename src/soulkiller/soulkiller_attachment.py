@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Attachment Analyzer — ECR-R inspired attachment pattern detection.
+"""Soulkiller Attachment Analyzer - ECR-R inspired attachment pattern detection.
 
 Analyzes relationship data (episodes, entity_relations, checkin_exchanges, decisions)
 to identify attachment anxiety/avoidance patterns per relationship context.
@@ -48,7 +48,7 @@ Assess SEPARATELY for each relationship context present in the data.
 === Decisions (relational choices) ===
 {decisions}
 
-Return JSON array — one object per relationship context:
+Return JSON array - one object per relationship context:
 [
   {{
     "relationship_context": "romantic",
@@ -185,12 +185,12 @@ def store_attachment(db, r: dict) -> None:
         now
     ))
 
-    # Generate facet observations — use average across contexts for each dimension
+    # Generate facet observations - use average across contexts for each dimension
     source_ref = f"attachment:{ctx}"
     anxiety = float(r.get("anxiety_level", 0.5))
     avoidance = float(r.get("avoidance_level", 0.5))
 
-    # Confidence lower for single context — will be averaged across contexts at trait level
+    # Confidence lower for single context - will be averaged across contexts at trait level
     conf = 0.55
 
     for dim_val, facet_id in [

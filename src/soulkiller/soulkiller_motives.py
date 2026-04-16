@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Implicit Motives — PSE-inspired n-Ach/Aff/Pow scoring (McClelland).
+"""Soulkiller Implicit Motives - PSE-inspired n-Ach/Aff/Pow scoring (McClelland).
 
 Scores implicit motives from spontaneous narrative content in episodes and decisions.
 Uses computerized content analysis inspired by PSE (Picture Story Exercise) coding (Smith et al., 1992).
@@ -35,7 +35,7 @@ MOTIVES_PROMPT = """You are applying McClelland's implicit motive scoring (PSE m
 to the subject's spontaneous narrative content. Implicit motives are inferred from unprompted stories,
 NOT from stated preferences.
 
-Analyze ONLY spontaneous narrative passages below (events, opinions, habits — not responses to direct questions).
+Analyze ONLY spontaneous narrative passages below (events, opinions, habits - not responses to direct questions).
 
 Score three implicit motives (0.0–1.0 each):
 

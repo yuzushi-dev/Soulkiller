@@ -90,7 +90,7 @@ def upsert_entity(db, entity_type: str, name: str, label: str | None,
 def insert_episode(db, episode_type: str, content: str, source_type: str,
                    source_ref: str, confidence: float, occurred_at: str | None,
                    entity_names: list[str], context: str | None) -> int:
-    # UNIQUE(episode_type, source_ref) — use numbered suffix to allow multiple per source
+    # UNIQUE(episode_type, source_ref) - use numbered suffix to allow multiple per source
     import hashlib
     content_hash = hashlib.md5(content.encode()).hexdigest()[:6]
     unique_ref = f"{source_ref}:{content_hash}"

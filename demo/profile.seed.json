@@ -11,7 +11,7 @@
   ],
   "goals": [
     "maintain sustainable work rhythms without sacrificing quality",
-    "improve relational consistency — particularly in difficult conversations",
+    "improve relational consistency - particularly in difficult conversations",
     "reduce the gap between decision quality and decision speed under pressure"
   ],
   "facets": [
@@ -274,7 +274,7 @@
     {
       "id": "h-003",
       "title": "Conflict Ambiguity",
-      "body": "Conflict style sits near center (0.52, confidence 0.47 — low). The subject shows direct communication and firm boundaries but also some avoidance of interpersonal confrontation (demo-015). This facet requires more signal before a stable position can be modeled. The low confidence score is correct.",
+      "body": "Conflict style sits near center (0.52, confidence 0.47 - low). The subject shows direct communication and firm boundaries but also some avoidance of interpersonal confrontation (demo-015). This facet requires more signal before a stable position can be modeled. The low confidence score is correct.",
       "facets": ["communication.conflict_style", "communication.directness", "relational.boundary_style"],
       "confidence": 0.47
     }
@@ -306,7 +306,7 @@
       "facet_id": "cognitive.information_gathering",
       "signal_strength": 0.80,
       "direction": "exhaustive",
-      "note": "Full documentation read before code — explicit preference for front-loaded information gathering."
+      "note": "Full documentation read before code - explicit preference for front-loaded information gathering."
     },
     {
       "message_id": "demo-014",

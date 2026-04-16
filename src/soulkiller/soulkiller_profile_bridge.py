@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Profile Bridge — syncs trait model to subject_profile.json + PROFILE.md.
+"""Soulkiller Profile Bridge - syncs trait model to subject_profile.json + PROFILE.md.
 
 Cron: soulkiller:profile-sync, daily at 03:30 (after synthesis)
 
@@ -132,7 +132,7 @@ def sync_profile() -> dict[str, Any]:
                 notes = trait.get("notes") or ""
                 contenuto = f"{trait.get('description', facet_id)}. {pos_text}"
                 if notes:
-                    contenuto += f" — {notes[:150]}"
+                    contenuto += f" - {notes[:150]}"
 
             if fonte in sk_records:
                 # Update existing
@@ -163,7 +163,7 @@ def sync_profile() -> dict[str, Any]:
                 })
                 added += 1
         else:
-            # Low confidence — mark existing record as da_verificare
+            # Low confidence - mark existing record as da_verificare
             if fonte in sk_records:
                 idx = sk_records[fonte]
                 if records[idx].get("stato") == "attivo":
@@ -202,7 +202,7 @@ def generate_profile_md() -> dict[str, Any]:
         status_counts[s] = status_counts.get(s, 0) + 1
 
     lines: list[str] = [
-        f"# Personality Model — the subject",
+        f"# Personality Model - the subject",
         f"Updated: {today} | Coverage: {covered}/{total} facets ({coverage_pct:.0f}%) | Avg confidence: {avg_conf:.2f}",
         "",
     ]
@@ -274,11 +274,11 @@ def generate_profile_md() -> dict[str, Any]:
 
             # Status detail line
             if trait_status == "unreliable":
-                lines.append(f"  Segnali contraddittori — questa facetta potrebbe non essere rilevabile con i dati attuali.")
+                lines.append(f"  Segnali contraddittori - questa facetta potrebbe non essere rilevabile con i dati attuali.")
             elif trait_status == "stalled":
-                lines.append(f"  Bloccata — nessuna nuova osservazione da 30+ giorni, confidenza bassa.")
+                lines.append(f"  Bloccata - nessuna nuova osservazione da 30+ giorni, confidenza bassa.")
             elif trait_status == "overfitting":
-                lines.append(f"  Rischio overfitting — alta confidenza ma bassa diversita' nelle fonti.")
+                lines.append(f"  Rischio overfitting - alta confidenza ma bassa diversita' nelle fonti.")
 
             # Show contextual clusters if available
             if facet_id not in NON_LINEAR_FACETS:

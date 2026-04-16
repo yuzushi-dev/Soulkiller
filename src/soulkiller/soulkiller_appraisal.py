@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Appraisal Theory Profiler — Lazarus/Scherer Framework.
+"""Soulkiller Appraisal Theory Profiler - Lazarus/Scherer Framework.
 
 Analyzes the subject's emotional episodes to build per-domain appraisal profiles:
 how he evaluates situations along dimensions of novelty, goal relevance,
@@ -39,7 +39,7 @@ Analyze only this domain: {domain}.
 Identify how the subject TYPICALLY appraises situations along these dimensions (Scherer's Component Process Model):
 1. **Novelty sensitivity**: Does he react strongly to unexpected events or take them in stride? (0=unfazed, 1=highly reactive to novelty)
 2. **Goal relevance weight**: How much does "is this relevant to MY goals?" drive his emotional response? (0=low, 1=highly goal-focused)
-3. **Coping potential default**: His default sense of control — does he feel capable of handling situations? (0=helpless, 1=highly capable)
+3. **Coping potential default**: His default sense of control - does he feel capable of handling situations? (0=helpless, 1=highly capable)
 4. **Agency attribution**: When something emotional happens, who/what does he blame? ("self", "other", "situation", "mixed")
 5. **Norm compatibility weight**: How much do social norms/expectations influence his appraisal? (0=ignores norms, 1=highly norm-sensitive)
 
@@ -152,7 +152,7 @@ def _call_llm(prompt: str, model: str) -> Any:
         if resp.status != 200:
             raise RuntimeError(f"API {resp.status}: {body[:300]}")
         msg = json.loads(body)["choices"][0]["message"]
-        # Try both fields — nemotron sometimes puts JSON in one and reasoning in other
+        # Try both fields - nemotron sometimes puts JSON in one and reasoning in other
         for field in ["content", "reasoning"]:
             text = msg.get(field, "")
             if text and "{" in text:

@@ -121,7 +121,7 @@ def build(out_dir: Path) -> None:
             "total_readings": len(bio_rows),
         }
 
-        # FGS — add days_stale
+        # FGS - add days_stale
         fgs_rows = safe_query(db, """
             SELECT f.id, f.category, f.name, f.sensitivity,
                    t.value_position, t.confidence, t.observation_count, t.status,

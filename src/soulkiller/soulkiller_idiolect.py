@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Soulkiller Idiolect Model — Linguistic fingerprint profiling.
+"""Soulkiller Idiolect Model - Linguistic fingerprint profiling.
 
 Computes the subject's unique linguistic signature from inbox messages:
 vocabulary richness, sentence patterns, style markers, n-grams,
 formulaic sequences, code-switching.
 
-NO LLM — purely programmatic analysis (like LIWC).
+NO LLM - purely programmatic analysis (like LIWC).
 
 Cron: soulkiller:idiolect, monthly 1st 04:00 Europe/Rome
 

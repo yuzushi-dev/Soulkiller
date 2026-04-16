@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Portrait Synthesizer — Livello 4
+"""Soulkiller Portrait Synthesizer - Livello 4
 
 Monthly synthesis of all soulkiller layers into a coherent
 narrative portrait of the subject, stored as PORTRAIT.md.
@@ -12,7 +12,7 @@ Integrates:
   - Communication metrics (behavioral signals)
   - High-confidence check-in reply observations
 
-Output: soulkiller/PORTRAIT.md — injected into relational agent sessions via the bootstrap hook.
+Output: soulkiller/PORTRAIT.md - injected into relational agent sessions via the bootstrap hook.
 
 Cron: soulkiller:portrait, monthly (1st day, 06:00 Europe/Rome)
 
@@ -426,10 +426,10 @@ def build_preamble(data: dict) -> str:
 
 PORTRAIT_PROMPT = """You are synthesizing a comprehensive personality portrait of the subject.
 This portrait will be injected into their relational agent's context via the bootstrap hook,
-so it should read as a deep behavioral model — not a clinical report.
+so it should read as a deep behavioral model - not a clinical report.
 
 Write a narrative portrait in ITALIAN, ~1200-1500 words, present tense.
-Structure it with markdown headers. Make it human and insightful — not a clinical report.
+Structure it with markdown headers. Make it human and insightful - not a clinical report.
 This should read like something a close friend who has studied the subject carefully would write.
 
 --- PERSONALITY DATA ---
@@ -501,13 +501,13 @@ IPOTESI COMPORTAMENTALI:
 
 Write the portrait with these sections:
 ## Chi è the subject
-(Sintesi di chi è come persona — 2-3 paragrafi)
+(Sintesi di chi è come persona - 2-3 paragrafi)
 
 ## Come pensa
 (Stile cognitivo, approccio ai problemi, decisioni)
 
 ## Come ragiona (processi cognitivi profondi)
-(Modelli mentali, Sistema 1/2, costrutti personali — come elabora informazioni e prende decisioni)
+(Modelli mentali, Sistema 1/2, costrutti personali - come elabora informazioni e prende decisioni)
 
 ## Come comunica
 (Stile comunicativo, humor, tono, impronta linguistica)
@@ -528,14 +528,14 @@ Write the portrait with these sections:
 (Quanto sono soddisfatti autonomia/competenza/relazionalità nei diversi domini della vita)
 
 ## Firme situazionali chiave
-(Come risponde in situazioni specifiche — le sue "firme comportamentali")
+(Come risponde in situazioni specifiche - le sue "firme comportamentali")
 
 ## Relational guidance
 (Consigli pratici su come relazionarsi con il soggetto, cosa funziona, cosa evitare)
 
 Rules:
 - Write entirely in Italian
-- Use specific evidence from the data — quote real behaviors, not generic observations
+- Use specific evidence from the data - quote real behaviors, not generic observations
 - For traits near poles (pos < 0.25 or pos > 0.75): state them clearly
 - For neutral traits (0.4-0.6): acknowledge ambiguity
 - For the "Relational guidance" section: be concrete and actionable
@@ -582,7 +582,7 @@ def build_prompt(data: dict) -> str:
 
     # Budget signals
     bud_lines = [
-        f"  {o['facet_id']}: pos={float(o['signal_position'] or 0.5):.2f} — {(o['content'] or '')[:100]}"
+        f"  {o['facet_id']}: pos={float(o['signal_position'] or 0.5):.2f} - {(o['content'] or '')[:100]}"
         for o in data["budget_obs"]
     ]
 
@@ -627,7 +627,7 @@ def build_prompt(data: dict) -> str:
         dyn = e["dynamic"] or ""
         sent = f"sentiment={e['sentiment']:.1f}" if e["sentiment"] is not None else ""
         entity_lines.append(
-            f"  {e['name']} [{rel}] ({e['mention_count']}x) — {desc[:60]} {dyn} {sent}".strip()
+            f"  {e['name']} [{rel}] ({e['mention_count']}x) - {desc[:60]} {dyn} {sent}".strip()
         )
 
     # Episodes
@@ -683,7 +683,7 @@ def build_prompt(data: dict) -> str:
                 conflicts = ""
         goal_lines.append(
             f"  [{g['priority_rank']}] [{g['domain']}|{g['horizon']}] "
-            f"progress={g['progress']:.1f} — {g['goal_text'][:80]} {conflicts}"
+            f"progress={g['progress']:.1f} - {g['goal_text'][:80]} {conflicts}"
         )
 
     # CAPS summary
@@ -788,7 +788,7 @@ def build_prompt(data: dict) -> str:
         except Exception:
             pass
         constr_lines.append(
-            f"  {c['pole_positive']}—{c['pole_negative']}{sup} "
+            f"  {c['pole_positive']}-{c['pole_negative']}{sup} "
             f"(freq={c['usage_frequency']:.2f}) [{domains}]"
         )
 
@@ -869,7 +869,7 @@ def _call_llm(prompt: str, model: str) -> str:
             {"role": "system", "content": (
                 "You are a skilled writer synthesizing a personality portrait "
                 "from behavioral and conversational data. Write only the portrait "
-                "content — no preamble, no meta-commentary."
+                "content - no preamble, no meta-commentary."
             )},
             {"role": "user", "content": prompt},
         ],

@@ -116,7 +116,7 @@ def migrate_decision_episodes(db) -> int:
 # ---------------------------------------------------------------------------
 
 DECISION_PROMPT = """Analyze these messages from the subject (Italian, 30s, tech worker).
-Extract explicit decisions, choices, or stated preferences — moments where he
+Extract explicit decisions, choices, or stated preferences - moments where he
 commits to something, rejects something, or states how he wants things to be.
 
 Messages (each has [date] prefix):

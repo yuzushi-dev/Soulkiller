@@ -39,11 +39,11 @@ def mark_processed() -> None:
 
 def run(local_date: str, dry_run: bool = False) -> None:
     if not SYNC_DB.exists():
-        warn(SCRIPT, f"Gadgetbridge.db not found at {SYNC_DB} — Syncthing not synced yet")
+        warn(SCRIPT, f"Gadgetbridge.db not found at {SYNC_DB} - Syncthing not synced yet")
         return
 
     if already_processed():
-        info(SCRIPT, "Gadgetbridge.db unchanged since last run — skipping")
+        info(SCRIPT, "Gadgetbridge.db unchanged since last run - skipping")
         return
 
     info(SCRIPT, f"processing {SYNC_DB} for date {local_date}")

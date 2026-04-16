@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Muse 2 EEG Recorder — Sprint 2.
+"""Soulkiller Muse 2 EEG Recorder - Sprint 2.
 
 Captures EEG buffers from Muse 2 (BLE) or a simulated source, computes
 per-session band power and session-level metrics, and stores them in the
@@ -344,7 +344,7 @@ def _run_lsl_session(rec: "MuseRecorder", duration_sec: int | None) -> None:
     channels = ["TP9", "AF7", "AF8", "TP10"]
     buffer_size = fs * 5  # 5-second buffers
 
-    print(f"Connected — fs={fs}Hz  context={rec.context_tag}", flush=True)
+    print(f"Connected - fs={fs}Hz  context={rec.context_tag}", flush=True)
     if duration_sec:
         print(f"Session duration: {duration_sec}s  (Ctrl+C to stop early)", flush=True)
     else:
@@ -420,12 +420,12 @@ def main() -> None:
         metrics = rec.end_session()
         if metrics:
             print(
-                f"\nSession ended — focus={metrics['focus_score']:.1f}  "
+                f"\nSession ended - focus={metrics['focus_score']:.1f}  "
                 f"calm={metrics['calm_score']:.1f}  "
                 f"engagement={metrics['engagement_index']:.2f}  "
                 f"FA={metrics['avg_frontal_asymmetry']:+.3f}"
                 if metrics.get("avg_frontal_asymmetry") is not None
-                else f"\nSession ended — focus={metrics['focus_score']:.1f}  "
+                else f"\nSession ended - focus={metrics['focus_score']:.1f}  "
                      f"calm={metrics['calm_score']:.1f}"
             )
         db.close()

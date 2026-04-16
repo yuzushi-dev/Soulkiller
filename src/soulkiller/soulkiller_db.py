@@ -418,7 +418,7 @@ FACETS: list[dict[str, Any]] = [
      "sensitivity": "media", "intrusion_base": 0.45},
     # Values (6)
     {"id": "values.core_values", "category": "values", "name": "core_values",
-     "description": "Valori fondamentali (non spettro lineare — lista di valori)",
+     "description": "Valori fondamentali (non spettro lineare - lista di valori)",
      "spectrum_low": None, "spectrum_high": None,
      "sensitivity": "media", "intrusion_base": 0.45},
     {"id": "values.fairness_model", "category": "values", "name": "fairness_model",
@@ -468,7 +468,7 @@ FACETS: list[dict[str, Any]] = [
      "spectrum_low": "massimalista", "spectrum_high": "minimalista",
      "sensitivity": "bassa", "intrusion_base": 0.25},
     {"id": "aesthetic.music_taste", "category": "aesthetic", "name": "music_taste",
-     "description": "Gusti musicali (non spettro lineare — generi e pattern)",
+     "description": "Gusti musicali (non spettro lineare - generi e pattern)",
      "spectrum_low": None, "spectrum_high": None,
      "sensitivity": "bassa", "intrusion_base": 0.25},
     {"id": "aesthetic.media_consumption", "category": "aesthetic", "name": "media_consumption",
@@ -493,7 +493,7 @@ FACETS: list[dict[str, Any]] = [
      "spectrum_low": "fixed mindset", "spectrum_high": "growth mindset",
      "sensitivity": "media", "intrusion_base": 0.45},
     {"id": "meta_cognition.cognitive_biases", "category": "meta_cognition", "name": "cognitive_biases",
-     "description": "Bias cognitivi osservati (non spettro — lista di bias)",
+     "description": "Bias cognitivi osservati (non spettro - lista di bias)",
      "spectrum_low": None, "spectrum_high": None,
      "sensitivity": "media", "intrusion_base": 0.45},
     {"id": "meta_cognition.reflection_habit", "category": "meta_cognition", "name": "reflection_habit",
@@ -509,7 +509,7 @@ FACETS: list[dict[str, Any]] = [
      "spectrum_low": "bisogno di certezza", "spectrum_high": "a proprio agio con l'ambiguità",
      "sensitivity": "media", "intrusion_base": 0.45},
 
-    # v2.0 facets — deep psychological constructs
+    # v2.0 facets - deep psychological constructs
     {"id": "relational.attachment_anxiety", "category": "relational", "name": "attachment_anxiety",
      "description": "Ansia da attaccamento (ECR-R): paura di rifiuto/abbandono nelle relazioni",
      "spectrum_low": "bassa ansia", "spectrum_high": "alta ansia",
@@ -543,7 +543,7 @@ FACETS: list[dict[str, Any]] = [
      "spectrum_low": "auto-trascendenza (benevolenza, universalismo)", "spectrum_high": "auto-affermazione (potere, successo)",
      "sensitivity": "media", "intrusion_base": 0.45},
 
-    # v3.0 facets — Tier 1 cognitive constructs
+    # v3.0 facets - Tier 1 cognitive constructs
     {"id": "language.verbal_complexity", "category": "language", "name": "verbal_complexity",
      "description": "Complessita' verbale: ricchezza vocabolario, struttura frasi, sofisticazione linguistica",
      "spectrum_low": "semplice/diretto", "spectrum_high": "complesso/elaborato",
@@ -604,7 +604,7 @@ def get_db(path: Path | None = None) -> sqlite3.Connection:
             if n == 0:
                 import sys
                 print(
-                    f"[SOULKILLER CRITICAL] DB at {db_path} has 0 observations — "
+                    f"[SOULKILLER CRITICAL] DB at {db_path} has 0 observations - "
                     "possible empty-recreation. Check data integrity before proceeding.",
                     file=sys.stderr,
                 )
@@ -898,7 +898,7 @@ def add_observation(
                  signal_strength, signal_position, context, ctx_meta_json, now_iso),
             )
         except sqlite3.IntegrityError:
-            # FK constraint failed — invalid facet_id from LLM
+            # FK constraint failed - invalid facet_id from LLM
             return None
         if cur.rowcount > 0:
             # Update trait observation count
@@ -1040,7 +1040,7 @@ def capture_reply(
 
 def ingest_inbox_line(line: dict[str, Any],
                       conn: sqlite3.Connection | None = None) -> bool:
-    # Defensive sender check — only ingest messages from the subject
+    # Defensive sender check - only ingest messages from the subject
     sender = str(line.get("from", line.get("from_id", "")))
     # Strip platform prefix (e.g. "telegram:demo-subject" → "demo-subject")
     sender_id = sender.rsplit(":", 1)[-1] if ":" in sender else sender
@@ -1478,7 +1478,7 @@ def apply_pending_corrections(conn: sqlite3.Connection) -> int:
             source_ref=f"correction:{row['id']}",
             content=note,
             signal_strength=1.0,
-            context="Manual subject correction — overrides inferred signal",
+            context="Manual subject correction - overrides inferred signal",
             conn=conn,
         )
         conn.execute(

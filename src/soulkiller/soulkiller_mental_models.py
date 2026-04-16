@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Mental Models — Johnson-Laird Framework.
+"""Soulkiller Mental Models - Johnson-Laird Framework.
 
 Analyzes the subject's reasoning patterns to identify how he constructs
 internal representations: spatial vs propositional, exhaustive vs minimal,
@@ -45,7 +45,7 @@ Identify how the subject constructs internal representations when reasoning abou
    - "mixed": varies by context
 
 2. **Model complexity**: How many alternative scenarios does he consider?
-   - "minimal": first-fit reasoning — takes the first model that works
+   - "minimal": first-fit reasoning - takes the first model that works
    - "moderate": considers 2-3 alternatives before deciding
    - "exhaustive": systematically considers many possibilities
 

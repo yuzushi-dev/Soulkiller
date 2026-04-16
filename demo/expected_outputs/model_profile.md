@@ -1,4 +1,4 @@
-# Soulkiller — Personality Model
+# Soulkiller - Personality Model
 
 **Subject**: Demo Subject
 **Generated**: 2026-04-08  (synthetic demo run)
@@ -170,7 +170,7 @@
 
 ### Conflict Ambiguity  ·  confidence 0.47 (moderate)
 
-> Conflict style sits near center (0.52, confidence 0.47 — low). The subject shows direct communication and firm boundaries but also some avoidance of interpersonal confrontation (demo-015). This facet requires more signal before a stable position can be modeled. The low confidence score is correct.
+> Conflict style sits near center (0.52, confidence 0.47 - low). The subject shows direct communication and firm boundaries but also some avoidance of interpersonal confrontation (demo-015). This facet requires more signal before a stable position can be modeled. The low confidence score is correct.
 
 *Facets involved: `communication.conflict_style`, `communication.directness`, `relational.boundary_style`*
 
@@ -179,5 +179,5 @@
 ## Active Goals
 
 - maintain sustainable work rhythms without sacrificing quality
-- improve relational consistency — particularly in difficult conversations
+- improve relational consistency - particularly in difficult conversations
 - reduce the gap between decision quality and decision speed under pressure

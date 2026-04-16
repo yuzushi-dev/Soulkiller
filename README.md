@@ -360,10 +360,10 @@ I'm looking at you, *corporats*.
 
 ## License
 
-[AGPL-3.0](LICENSE) — if you use this in a product or service, your modifications must be open source too.
+[AGPL-3.0](LICENSE) - if you use this in a product or service, your modifications must be open source too.
 
 > *Arasaka built Mikoshi to own souls behind closed doors. This project does the opposite.*
-> *If you're a corp looking to quietly absorb this into your stack — the license sees you.*
+> *If you're a corp looking to quietly absorb this into your stack - the license sees you.*
 
 ---
 

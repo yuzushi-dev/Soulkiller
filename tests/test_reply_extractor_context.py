@@ -1,4 +1,4 @@
-"""Tests for soulkiller_reply_extractor — recent-exchanges context block."""
+"""Tests for soulkiller_reply_extractor - recent-exchanges context block."""
 import sys
 from pathlib import Path
 

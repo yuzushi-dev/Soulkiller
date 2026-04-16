@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Reply Extractor — Livello 3 Feedback Loop
+"""Soulkiller Reply Extractor - Livello 3 Feedback Loop
 
 Processes pending check-in exchange replies (observations_extracted=0)
 and converts them into soulkiller observations, closing the human
@@ -127,7 +127,7 @@ def _build_context_block(recent: list[dict]) -> str:
     """Format recent exchanges as a context preamble for the extraction prompt."""
     if not recent:
         return ""
-    lines = ["Recent subject exchanges (for calibration context — do not re-extract):"]
+    lines = ["Recent subject exchanges (for calibration context - do not re-extract):"]
     for ex in recent:
         q = (ex.get("question_text") or "")[:120].strip()
         a = (ex.get("reply_text") or "")[:120].strip()

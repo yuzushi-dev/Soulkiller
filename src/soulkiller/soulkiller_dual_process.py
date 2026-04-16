@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Dual Process Profiler — Kahneman S1/S2 Framework.
+"""Soulkiller Dual Process Profiler - Kahneman S1/S2 Framework.
 
 Hybrid analysis: programmatic detection of dual-process markers
 (self-corrections, deliberation markers, snap judgments) +

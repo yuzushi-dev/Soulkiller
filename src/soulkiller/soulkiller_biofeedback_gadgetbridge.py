@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gadgetbridge SQLite export parser — ingests biofeedback into soulkiller.db.
+"""Gadgetbridge SQLite export parser - ingests biofeedback into soulkiller.db.
 
 Reads the Gadgetbridge.db exported from the Android app (hamburger → Database
 Management → Export DB) and populates biofeedback_readings + observations for
@@ -242,7 +242,7 @@ def extract_pai(gb: sqlite3.Connection, local_date: str) -> dict | None:
     """Estrae PAI giornaliero da HUAMI_PAI_SAMPLE.
 
     Ritorna un dict con pai_today (attività del giorno) e zone di intensità,
-    invece del solo PAI_TOTAL (accumulato storico — semanticamente sbagliato
+    invece del solo PAI_TOTAL (accumulato storico - semanticamente sbagliato
     per il modello giornaliero).
     """
     start, end = _day_window_ms(local_date)
@@ -410,7 +410,7 @@ def run(gb_path: str, local_date: str, dry_run: bool = False) -> None:
     gb.close()
 
     if not signals:
-        warn(SCRIPT, "no signals extracted — nothing to write")
+        warn(SCRIPT, "no signals extracted - nothing to write")
         return
 
     info(SCRIPT, f"signals: {sorted(signals.keys())}")

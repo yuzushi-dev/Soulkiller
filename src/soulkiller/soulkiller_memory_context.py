@@ -1,4 +1,4 @@
-"""Soulkiller Memory Context — operational memory layer for agent sessions.
+"""Soulkiller Memory Context - operational memory layer for agent sessions.
 
 Reads from soulkiller.db (hypotheses, traits, facets, entities) and produces
 a compact, psychologically-grounded context bundle for agent injection.

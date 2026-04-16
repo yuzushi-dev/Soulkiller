@@ -1,4 +1,4 @@
-"""Tests for MemoryContextBuilder — Soulkiller native memory layer.
+"""Tests for MemoryContextBuilder - Soulkiller native memory layer.
 
 Reads from hypotheses, traits, facets, entities in soulkiller.db and
 produces a compact, psychologically-grounded context bundle for agents.
@@ -120,7 +120,7 @@ def populated_db(empty_db):
         [
             (1, "Tends to isolate under cognitive overload, reducing social engagement significantly.", "confirmed", 0.92),
             (2, "Shows strong analytical bias in decision-making, preferring data over intuition.", "confirmed", 0.88),
-            (3, "Routine attachment facet in decline — structural disruption to temporal stability.", "drift_alert", 0.85),
+            (3, "Routine attachment facet in decline - structural disruption to temporal stability.", "drift_alert", 0.85),
             (4, "Direct communication style contrasts with tendency to withdraw in conflict.", "unverified", 0.60),
             (5, "Possible anxiety pattern linked to deadline proximity.", "unverified", 0.45),
         ]

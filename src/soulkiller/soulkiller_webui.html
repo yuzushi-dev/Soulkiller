@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
-    /* ── Design tokens — Arasaka / neomilitarist control deck ── */
+    /* ── Design tokens - Arasaka / neomilitarist control deck ── */
     :root {
       --background:    #070709;
       --surface:       #0f0b0d;
@@ -697,7 +697,7 @@
     </nav>
     <div class="sidebar-footer">
       <div style="font-size:10px;letter-spacing:.14em;color:var(--accent-soft);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px;">SECURE YOUR SOUL</div>
-      <div id="last-refresh">—</div>
+      <div id="last-refresh">-</div>
       <button class="refresh-btn" onclick="refresh()">↺ Sync</button>
       <div style="margin-top:10px;font-size:9px;letter-spacing:.1em;color:rgba(198,166,103,.4);font-family:var(--font-mono);">荒坂 · ENGRAMMATIC TRANSFER SYSTEM<br>UNAUTHORIZED ACCESS IS A CAPITAL OFFENSE</div>
     </div>
@@ -808,7 +808,7 @@
       <div class="alert alert-info" style="margin-bottom:16px">
         <span class="alert-icon">◎</span>
         <div style="font-size:13px;line-height:1.6">
-          <strong>What this does:</strong> Shows exactly what psychological context gets injected into an agent's prompt before it responds — confirmed behavioral hypotheses, high-confidence personality traits, active entities.<br>
+          <strong>What this does:</strong> Shows exactly what psychological context gets injected into an agent's prompt before it responds - confirmed behavioral hypotheses, high-confidence personality traits, active entities.<br>
           <strong>How to use:</strong> Type a query that mimics what an agent would receive (e.g. <em>"subject is stressed, how should I respond"</em> or <em>"technical decision on a project"</em>), pick a role, press <strong>Inspect</strong>. Use the retrieval trace to see which sources were prioritized and why.<br>
           <strong>When useful:</strong> debugging unexpected agent behavior · verifying the model reflects recent drift · checking which hypotheses dominate a given context.
         </div>
@@ -816,7 +816,7 @@
 
       <div class="card" style="margin-bottom:16px">
         <div class="card-title">Provider</div>
-        <div id="ctx-provider-status">—</div>
+        <div id="ctx-provider-status">-</div>
       </div>
 
       <div class="card" style="margin-bottom:16px">
@@ -928,7 +928,7 @@
       <h1 class="page-title">Biofeedback</h1>
       <p class="page-sub">Wetware interface · physiological signal console</p>
       <div class="card" style="margin-bottom:16px">
-        <div class="card-title">Latest Reading <span id="bio-date" class="badge badge-muted" style="margin-left:4px">—</span></div>
+        <div class="card-title">Latest Reading <span id="bio-date" class="badge badge-muted" style="margin-left:4px">-</span></div>
         <div id="bio-latest"></div>
       </div>
       <div class="grid-3" style="margin-bottom:16px">
@@ -1088,7 +1088,7 @@ function fSelect(id, options, current) {
   const opts = options.map(o =>
     `<option value="${escapeHtml(o)}" ${o === current ? 'selected' : ''}>${escapeHtml(o)}</option>`
   ).join('');
-  return `<select id="${escapeHtml(id)}" class="form-input"><option value="">— nessuno —</option>${opts}</select>`;
+  return `<select id="${escapeHtml(id)}" class="form-input"><option value="">- nessuno -</option>${opts}</select>`;
 }
 
 function fInput(id, val, placeholder='') {
@@ -1105,7 +1105,7 @@ const ENTITY_TYPES = ['person','place','project','activity','organization','obje
 function openEntityModal(id) {
   const e = entityCache.find(x => x.id === id);
   if (!e) return;
-  document.getElementById('modal-title').textContent = `Entity — ${e.name}`;
+  document.getElementById('modal-title').textContent = `Entity - ${e.name}`;
   document.getElementById('modal-body').innerHTML =
     field('Type',        fSelect('ef-type', ENTITY_TYPES, e.entity_type)) +
     field('Name',        fInput('ef-name', e.name)) +
@@ -1440,8 +1440,8 @@ function sensitivityBadge(s) {
   return `<span class="badge badge-muted">${s}</span>`;
 }
 
-function fmtDate(d) { return d ? d.slice(0,10) : '—'; }
-function fmtDateTime(d) { return d ? d.replace('T',' ').slice(0,16) : '—'; }
+function fmtDate(d) { return d ? d.slice(0,10) : '-'; }
+function fmtDateTime(d) { return d ? d.replace('T',' ').slice(0,16) : '-'; }
 
 // ── Health ────────────────────────────────────────────────────────────────
 async function loadHealth() {
@@ -1475,7 +1475,7 @@ function renderKPI(h) {
 function renderAlerts(h, obs) {
   const alerts = [];
   if (obs.bootstrap_loop_risk)
-    alerts.push(`<div class="alert alert-danger"><span class="alert-icon">⚠</span><div><strong>Bootstrap loop risk</strong> — ${obs.session_behavioral_pct_7d}% of observations in the last 7 days come from session_behavioral (threshold: 60%). The synthesizer will reduce their weight automatically.</div></div>`);
+    alerts.push(`<div class="alert alert-danger"><span class="alert-icon">⚠</span><div><strong>Bootstrap loop risk</strong> - ${obs.session_behavioral_pct_7d}% of observations in the last 7 days come from session_behavioral (threshold: 60%). The synthesizer will reduce their weight automatically.</div></div>`);
   if (h.inbox_unprocessed > 200)
     alerts.push(`<div class="alert alert-warn"><span class="alert-icon">◉</span><div><strong>${h.inbox_unprocessed.toLocaleString()} messages</strong> in inbox not yet processed by the extractor.</div></div>`);
   document.getElementById('health-alerts').innerHTML = alerts.join('');
@@ -1582,14 +1582,14 @@ function renderCron(jobs) {
     const err = lastStatus === 'error';
     const dotCls = !j.enabled ? 'dot-off' : ok ? 'dot-ok' : err ? 'dot-error' : 'dot-warn';
     const errors = s.consecutiveErrors || 0;
-    const schedExpr = typeof j.schedule === 'string' ? j.schedule : (j.schedule?.expr || '—');
+    const schedExpr = typeof j.schedule === 'string' ? j.schedule : (j.schedule?.expr || '-');
     return `<tr>
       <td><span class="mono" style="color:var(--foreground)">${escapeHtml(j.id)}</span></td>
       <td><span class="mono" style="color:var(--accent-fg);font-size:11px">${escapeHtml(schedExpr)}</span></td>
-      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._last_run_ago || '—')}</td>
-      <td><span class="dot ${escapeHtml(dotCls)}"></span> <span style="font-size:12px;color:var(--muted-fg)">${escapeHtml(lastStatus || '—')}</span></td>
-      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._next_run_in || '—')}</td>
-      <td style="color:${errors>0?'var(--danger)':'var(--muted-fg)'};font-weight:${errors>0?700:400}">${errors || '—'}</td>
+      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._last_run_ago || '-')}</td>
+      <td><span class="dot ${escapeHtml(dotCls)}"></span> <span style="font-size:12px;color:var(--muted-fg)">${escapeHtml(lastStatus || '-')}</span></td>
+      <td style="color:var(--muted-fg);font-size:12px">${escapeHtml(j._next_run_in || '-')}</td>
+      <td style="color:${errors>0?'var(--danger)':'var(--muted-fg)'};font-weight:${errors>0?700:400}">${errors || '-'}</td>
       <td><div class="toggle-wrap"><input type="checkbox" class="toggle" ${j.enabled?'checked':''}
         onchange="toggleJob('${escapeHtml(String(j.id))}', this.checked)"></div></td>
     </tr>`;
@@ -1715,11 +1715,11 @@ async function loadFGS() {
       <td>
         <div class="conf-bar-wrap">
           <div class="conf-bar-track" style="width:60px"><div class="conf-bar-fill" style="width:${((conf||0)*100).toFixed(0)}%;background:${confColor(conf)}"></div></div>
-          <span style="font-size:12px;color:${confColor(conf)};font-weight:600">${conf!=null?(conf*100).toFixed(0)+'%':'—'}</span>
+          <span style="font-size:12px;color:${confColor(conf)};font-weight:600">${conf!=null?(conf*100).toFixed(0)+'%':'-'}</span>
         </div>
       </td>
       <td style="color:var(--foreground-2)">${f.observation_count ?? 0}</td>
-      <td style="color:${stale>30?'var(--warn)':'var(--muted-fg)'}">${stale != null ? stale + 'd' : '—'}</td>
+      <td style="color:${stale>30?'var(--warn)':'var(--muted-fg)'}">${stale != null ? stale + 'd' : '-'}</td>
       <td>${sensitivityBadge(f.sensitivity)}</td>
     </tr>`;
   }).join('');
@@ -1838,11 +1838,11 @@ async function loadDecisions() {
   const el = document.getElementById('decisions-body');
   if (!rows.length) { el.innerHTML = emptyState('◑', 'No decisions', 'Extracted daily by the decisions cron'); return; }
   const byDomain = {};
-  for (const d of rows) { const k = d.domain || '— no domain —'; if (!byDomain[k]) byDomain[k] = []; byDomain[k].push(d); }
+  for (const d of rows) { const k = d.domain || '- no domain -'; if (!byDomain[k]) byDomain[k] = []; byDomain[k].push(d); }
   // Sort: known domains first, then null
   const sorted = Object.entries(byDomain).sort(([a], [b]) => {
-    if (a.startsWith('—')) return 1;
-    if (b.startsWith('—')) return -1;
+    if (a.startsWith('-')) return 1;
+    if (b.startsWith('-')) return -1;
     return a.localeCompare(b);
   });
   el.innerHTML = sorted.map(([domain, decisions]) => `
@@ -1853,7 +1853,7 @@ async function loadDecisions() {
         return `<div class="mem-card">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div style="display:flex;gap:6px">
-              ${d.direction ? `<span class="badge ${dirBadge}">${escapeHtml(d.direction)}</span>` : '<span class="badge badge-muted">—</span>'}
+              ${d.direction ? `<span class="badge ${dirBadge}">${escapeHtml(d.direction)}</span>` : '<span class="badge badge-muted">-</span>'}
               ${d.context ? `<span class="badge badge-muted">${escapeHtml(d.context.slice(0,40))}</span>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:2px">
@@ -1878,7 +1878,7 @@ async function loadCheckin() {
     return `<div class="checkin-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="badge badge-accent" style="font-family:var(--font-mono)">${escapeHtml(c.facet_id || '—')}</span>
+          <span class="badge badge-accent" style="font-family:var(--font-mono)">${escapeHtml(c.facet_id || '-')}</span>
           ${replied ? '<span class="badge badge-success">reply received</span>' : '<span class="badge badge-muted">pending</span>'}
           ${hasFollowup ? '<span class="badge badge-blue">followup sent</span>' : ''}
           ${c.observations_extracted ? `<span class="badge badge-muted">${c.observations_extracted} obs extracted</span>` : ''}
@@ -1999,7 +1999,7 @@ async function loadBiofeedback() {
   // Ultima lettura
   const dateEl = document.getElementById('bio-date');
   const latestEl = document.getElementById('bio-latest');
-  dateEl.textContent = summary.latest_date || '—';
+  dateEl.textContent = summary.latest_date || '-';
   const lat = summary.latest || {};
 
   // Display order for latest card
@@ -2009,7 +2009,7 @@ async function loadBiofeedback() {
 
   if (Object.keys(lat).length === 0) {
     latestEl.innerHTML = `<div class="mem-meta" style="text-align:center;padding:24px 0">
-      No data — the ring syncs overnight.<br>
+      No data - the ring syncs overnight.<br>
       <span style="font-size:11px;color:var(--muted-fg)">First reading will appear after the first night with the ring.</span>
     </div>`;
   } else {
@@ -2078,7 +2078,7 @@ function renderMotives(motives) {
   const meta = document.getElementById('motives-meta');
   if (!motives.length) {
     document.getElementById('chart-motives').style.display='none';
-    meta.textContent = 'No data — runs on the 10th of each month';
+    meta.textContent = 'No data - runs on the 10th of each month';
     return;
   }
   const m = motives[0];
@@ -2112,7 +2112,7 @@ function renderStress(stress) {
           ${lvl ? `<span class="badge" style="background:${levelColor[lvl]||'var(--muted)'};color:#000">${lvl}</span>` : ''}
           ${s.dominant_signal ? `<span class="badge badge-muted">${s.dominant_signal}</span>` : ''}
           <span style="font-size:18px;font-weight:700;color:${s.stress_index>0.6?'var(--danger)':s.stress_index>0.35?'var(--warn)':'var(--success)'}">
-            ${typeof s.stress_index === 'number' ? s.stress_index.toFixed(2) : '—'}
+            ${typeof s.stress_index === 'number' ? s.stress_index.toFixed(2) : '-'}
           </span>
         </div>
       </div>
@@ -2139,7 +2139,7 @@ function renderSchemas(schemas) {
     <div class="mem-card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div>
-          <span style="font-weight:600;font-size:14px;color:var(--foreground)">${s.schema_name || '—'}</span>
+          <span style="font-weight:600;font-size:14px;color:var(--foreground)">${s.schema_name || '-'}</span>
           ${s.schema_domain ? `<span class="badge badge-purple" style="margin-left:8px">${s.schema_domain}</span>` : ''}
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">

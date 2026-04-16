@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Narrative Identity — McAdams narrative structure analysis.
+"""Soulkiller Narrative Identity - McAdams narrative structure analysis.
 
 Analyzes the subject's life episodes, decisions and goals to assess:
 - Narrative agency (protagonist vs. reactive framing)
@@ -34,7 +34,7 @@ LLM_TIMEOUT = 300
 
 NARRATIVE_PROMPT = """You are a narrative psychologist applying Dan McAdams' Life Story Model to the subject (Italian, 30s, tech worker).
 
-Analyze his episodes, decisions, and current projects to assess his NARRATIVE IDENTITY — how he constructs a coherent life story.
+Analyze his episodes, decisions, and current projects to assess his NARRATIVE IDENTITY - how he constructs a coherent life story.
 
 === Episodes (life events and facts) ===
 {episodes}
@@ -67,10 +67,10 @@ Return JSON:
   "narrative_coherence": 0.70,
   "confidence": 0.65,
   "dominant_theme": "Costruisce sistemi autonomi per ridurre dipendenza e caos",
-  "agency_evidence": "Actively builds OpenClaw, starts therapy, adopts Fluoxetine — all proactive choices",
-  "redemptive_evidence": "Describes Fluoxetine+therapy as 'lighter and less irritable' — positive reframing of mental health work",
+  "agency_evidence": "Actively builds OpenClaw, starts therapy, adopts Fluoxetine - all proactive choices",
+  "redemptive_evidence": "Describes Fluoxetine+therapy as 'lighter and less irritable' - positive reframing of mental health work",
   "nuclear_episodes": [
-    {{"type": "turning_point", "content": "Inizio terapia psicologica e Fluoxetina — scelta proattiva di cambiamento"}},
+    {{"type": "turning_point", "content": "Inizio terapia psicologica e Fluoxetina - scelta proattiva di cambiamento"}},
     {{"type": "peak", "content": "a close contact che nota cambiamenti positivi in the subject"}},
     {{"type": "nadir", "content": "Periodo di irritabilità e chiusura prima della terapia"}}
   ]

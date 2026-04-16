@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Schema Detector — Early Maladaptive Schemas (Young 1990).
+"""Soulkiller Schema Detector - Early Maladaptive Schemas (Young 1990).
 
 Analizza il corpus inbox per rilevare i 18 schemi di Young.
 
@@ -55,7 +55,7 @@ The 18 schemas and their behavioral/linguistic indicators:
 Messages (last {n} from the subject):
 {messages}
 
-Return a JSON array — only schemas with clear evidence (skip absent/unclear ones):
+Return a JSON array - only schemas with clear evidence (skip absent/unclear ones):
 [
   {{
     "schema_name": "mistrust_abuse",
@@ -252,12 +252,12 @@ def _consensus_merge(primary: list, secondary: list, threshold: float = 0.55) ->
     for name, s in primary_map.items():
         s2 = secondary_map.get(name)
         if s2:
-            # Both agree — average confidence
+            # Both agree - average confidence
             s = dict(s)
             s["confidence"] = (float(s["confidence"]) + float(s2["confidence"])) / 2
             s["_consensus"] = True
         else:
-            # Only primary detected it — lower confidence
+            # Only primary detected it - lower confidence
             s = dict(s)
             s["confidence"] = float(s["confidence"]) * 0.7
             s["_consensus"] = False

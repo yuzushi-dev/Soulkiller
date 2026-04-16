@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Goals — Estrae gerarchia goal e conflitti da inbox + decisioni.
+"""Soulkiller Goals - Estrae gerarchia goal e conflitti da inbox + decisioni.
 
 Cron: soulkiller:goals, monthly 1° del mese 05:30 Europe/Rome
 
@@ -37,7 +37,7 @@ Context data:
 === Known episodes/facts ===
 {episodes}
 
-Extract his ACTIVE goals — things he's currently working toward, planning, or investing effort in.
+Extract his ACTIVE goals - things he's currently working toward, planning, or investing effort in.
 
 Return JSON:
 {{
@@ -154,7 +154,7 @@ def run(model: str = DEFAULT_MODEL, dry_run: bool = False, sample: int | None = 
     try:
         if not dry_run and should_skip(db, "goals"):
             return
-        # IMP-08: adaptive cadence — boost sample under sustained stress
+        # IMP-08: adaptive cadence - boost sample under sustained stress
         stress_triggered = _check_stress_trigger(db)
         if stress_triggered and sample is None:
             sample = 20

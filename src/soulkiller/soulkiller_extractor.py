@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Extractor — ingests inbox.jsonl and extracts personality signals via LLM.
+"""Soulkiller Extractor - ingests inbox.jsonl and extracts personality signals via LLM.
 
 Cron: soulkiller:extract, every 2 hours
 
@@ -34,7 +34,7 @@ def _data_dir() -> Path:
 
 INBOX_PATH = _data_dir() / "inbox.jsonl"
 MAX_BATCHES = 40  # More batches per run
-BATCH_SIZE = 3   # 3 messages per LLM call — 3x throughput vs single-message batches
+BATCH_SIZE = 3   # 3 messages per LLM call - 3x throughput vs single-message batches
 LLM_TIMEOUT_SECONDS = 180  # 3 minutes per batch
 DEFAULT_MODEL = "google-aistudio/gemini-2.5-flash"  # Free via AI Studio, rate-limited only
 STRICT_JSON_FALLBACK_MODELS = (
@@ -115,7 +115,7 @@ Rules:
 - signal_position: 0.0 = spectrum_low end, 1.0 = spectrum_high end. Omit for list-type facets (core_values, music_taste, cognitive_biases).
 - signal_strength: how confident you are this observation is meaningful (0.0-1.0).
 - tone: classify the emotional tone of the source message as one of: neutral, tense, playful, serious, frustrated, warm, cold.
-- Be specific in extracted_signal — quote relevant parts of the message.
+- Be specific in extracted_signal - quote relevant parts of the message.
 
 Messages:
 {chr(10).join(msg_list)}
@@ -133,7 +133,7 @@ def extract_signals(messages: list[dict[str, Any]], client: RuntimeClient,
     prompt = build_extraction_prompt(messages, facets)
 
     try:
-        # Always use direct HTTP — openclaw agent path times out too often.
+        # Always use direct HTTP - openclaw agent path times out too often.
         # Fall back to agent only if no providers are configured.
         if not model:
             model = DEFAULT_MODEL
@@ -357,7 +357,7 @@ def correlate_checkin_replies(messages: list[dict[str, Any]], client: RuntimeCli
         if not content.strip():
             continue
 
-        # Lightweight LLM YES/NO match — use direct HTTP, NOT run_agent_json
+        # Lightweight LLM YES/NO match - use direct HTTP, NOT run_agent_json
         # (run_agent_json routes through main agent and delivers JSON to Telegram DM)
         match_prompt = (
             f'Is this message a reply to the following check-in question?\n'
@@ -461,7 +461,7 @@ def main() -> int:
         # Step 3: Extract personality signals
         signals = extract_signals(messages, client, facets, model=args.model)
         if signals is None:
-            # LLM error — skip this batch, don't mark processed so we retry later
+            # LLM error - skip this batch, don't mark processed so we retry later
             warn(SCRIPT, "batch_skipped_llm_error", batch=batch_num + 1)
             break
         if signals:

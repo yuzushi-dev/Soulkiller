@@ -1,5 +1,5 @@
 """
-SMELT Layer 4 — Query-Conditioned Facet Retrieval (Python port).
+SMELT Layer 4 - Query-Conditioned Facet Retrieval (Python port).
 
 Porta la logica di smelt-retrieval.ts in Python per filtrare la lista facets
 nell'extractor: dato il contenuto dei messaggi in lavorazione, restituisce
@@ -127,7 +127,7 @@ def filter_facets_by_query(
             raw_text = facet_texts[i].lower()
 
             if term in fid_tokens:
-                score += 4.5 * idf  # key field (id) match — highest weight
+                score += 4.5 * idf  # key field (id) match - highest weight
             elif term in token_set:
                 score += 3.0 * idf  # spectrum text match
             elif term in raw_text:
@@ -136,7 +136,7 @@ def filter_facets_by_query(
 
     top_score = max(scores)
     if top_score < _MIN_SCORE:
-        # No meaningful match — return all
+        # No meaningful match - return all
         return facets
 
     cutoff = max(_MIN_SCORE, top_score * _SCORE_CUTOFF_RATIO)
@@ -148,7 +148,7 @@ def filter_facets_by_query(
 
     min_facets = max(3, int(len(facets) * _MIN_FACETS_RATIO))
     if len(above_cutoff) < min_facets:
-        # Too few results — return full list
+        # Too few results - return full list
         return facets
 
     ranked = above_cutoff[:max_facets]

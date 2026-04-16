@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Health Check — FAST version, verifies pipeline is working.
+"""Soulkiller Health Check - FAST version, verifies pipeline is working.
 
 Cron: soulkiller:healthcheck, daily at 04:00 Europe/Rome
 
@@ -154,7 +154,7 @@ def check_backup() -> dict:
     """Verify a recent SQLite backup exists (IMP-05). Backup must be < 8 days old."""
     backup_files = sorted(SOULKILLER_DIR.glob("soulkiller_backup_*.db"), reverse=True)
     if not backup_files:
-        return {"status": "degraded", "error": "no backup found — run weekly backup cron"}
+        return {"status": "degraded", "error": "no backup found - run weekly backup cron"}
     latest = backup_files[0]
     age_days = (datetime.now(timezone.utc).timestamp() - latest.stat().st_mtime) / 86400
     if age_days > 8:
@@ -242,7 +242,7 @@ def check_agent_influence() -> dict:
                 "agent_influence_index": round(index, 3),
                 "ai_mediated": ai_mediated,
                 "total": total,
-                "warning": "bootstrap loop risk — AI-mediated observations > 60%",
+                "warning": "bootstrap loop risk - AI-mediated observations > 60%",
             }
 
         return {"status": "ok", "agent_influence_index": round(index, 3),

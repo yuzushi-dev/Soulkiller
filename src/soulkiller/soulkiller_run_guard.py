@@ -1,5 +1,5 @@
 """
-RunGuard — delta triggering per gli analyzer Soulkiller.
+RunGuard - delta triggering per gli analyzer Soulkiller.
 
 Traccia l'ultimo inbox.id processato per ogni analyzer.
 Se non sono arrivati nuovi messaggi da allora, should_skip() restituisce True
@@ -59,7 +59,7 @@ def should_skip(db: sqlite3.Connection, analyzer: str, *, verbose: bool = False)
     max_id = max_row[0] if max_row else None  # None se inbox vuota
 
     if last_id is None and max_id is None:
-        # inbox sempre vuota — niente da fare
+        # inbox sempre vuota - niente da fare
         return True
     if last_id is None and max_id is not None:
         # la prima volta che ci sono messaggi
@@ -67,7 +67,7 @@ def should_skip(db: sqlite3.Connection, analyzer: str, *, verbose: bool = False)
 
     skip = (max_id is None) or (max_id <= last_id)
     if skip and verbose:
-        print(f"[run_guard] {analyzer}: nessun nuovo messaggio (last={last_id}, max={max_id}) — skip")
+        print(f"[run_guard] {analyzer}: nessun nuovo messaggio (last={last_id}, max={max_id}) - skip")
     return skip
 
 

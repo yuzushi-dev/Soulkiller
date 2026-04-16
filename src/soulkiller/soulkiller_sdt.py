@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller SDT — Self-Determination Theory Need Satisfaction.
+"""Soulkiller SDT - Self-Determination Theory Need Satisfaction.
 
 Traccia autonomy/competence/relatedness satisfaction per dominio
 (lavoro, relazioni, personale) da inbox recente.
@@ -165,7 +165,7 @@ def run(model: str = DEFAULT_MODEL, period: str | None = None,
             now = datetime.now(timezone.utc)
             period = f"{now.year:04d}-{now.month:02d}"
 
-        # IMP-08: adaptive cadence — boost message sample under sustained stress
+        # IMP-08: adaptive cadence - boost message sample under sustained stress
         msg_limit = 100
         if _check_stress_trigger(db):
             msg_limit = 20

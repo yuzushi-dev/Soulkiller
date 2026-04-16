@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Web UI — monitoring dashboard for the CPIS pipeline.
+"""Soulkiller Web UI - monitoring dashboard for the CPIS pipeline.
 
 Requires the webui optional dependencies:
   pip install -e ".[webui]"
@@ -186,7 +186,7 @@ class DecisionPatch(BaseModel):
 @app.get("/api/cron")
 def api_cron() -> list[dict]:
     data = load_jobs()
-    # Only expose soulkiller-owned jobs — never leak unrelated cron entries.
+    # Only expose soulkiller-owned jobs - never leak unrelated cron entries.
     jobs = [j for j in data.get("jobs", []) if j.get("id", "").startswith("soulkiller:")]
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     for j in jobs:
@@ -280,7 +280,7 @@ def api_hypotheses() -> list[dict]:
 
 @app.get("/api/profile/fgs")
 def api_fgs() -> list[dict]:
-    """Facet Gap Score ranking — what the question engine would prioritize."""
+    """Facet Gap Score ranking - what the question engine would prioritize."""
     db = get_db()
     try:
         rows = safe_query(db, """
@@ -580,7 +580,7 @@ def _load_provider():
     """Return a SoulkillerMemoryProvider backed by the active DB_PATH.
 
     In OSS this is the demo DB (or SOULKILLER_DATA_DIR).
-    No external package required — reads hypotheses/traits/entities directly.
+    No external package required - reads hypotheses/traits/entities directly.
     """
     import sys as _sys
     _lib = Path(__file__).resolve().parents[2] / "lib"

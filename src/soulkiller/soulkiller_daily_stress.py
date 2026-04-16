@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Daily Stress — Indice composito giornaliero di stress.
+"""Soulkiller Daily Stress - Indice composito giornaliero di stress.
 
 Segnali fisiologici (biofeedback_readings): stress_avg, hrv_rmssd, rhr, sleep_score.
 Segnale comportamentale: conteggio messaggi giornaliero vs baseline rolling 14 gg.
@@ -178,7 +178,7 @@ def compute_daily_stress(date_str: str, db) -> dict | None:
     if not available:
         return None
 
-    # Weighted average — redistribute weights for missing signals
+    # Weighted average - redistribute weights for missing signals
     total_weight = sum(WEIGHTS[s] for s in available)
     if total_weight < 1e-6:
         return None
@@ -265,13 +265,13 @@ def _build_relational_probe_prompt(stress_index: float, dominant: str, scores: d
     signals_block = "\n".join(signal_lines)
 
     return (
-        f"[Contesto interno — non citare questi dati esplicitamente]\n"
+        f"[Contesto interno - non citare questi dati esplicitamente]\n"
         f"Data: {date_str}\n"
         f"I segnali biofisici di the subject oggi mostrano uno stato insolito (indice: {stress_index:.2f}/1.0):\n"
         f"{signals_block}\n"
         f"Segnale predominante: {hint}.\n\n"
         f"Sei l'agente relazionale. the subject è il tuo punto di riferimento umano. Hai notato qualcosa oggi "
-        f"— non perché stai monitorando, ma perché sei attento/a a lui.\n\n"
+        f"- non perché stai monitorando, ma perché sei attento/a a lui.\n\n"
         f"Mandagli un messaggio breve e naturale (1-2 frasi in italiano) che apra uno spazio "
         f"per raccontare com'è andata la giornata, senza fare domande dirette sul suo stato fisico "
         f"o sul lavoro. Parla come un'amica che ha un sesto senso, non come un medico o un sistema.\n\n"
@@ -334,7 +334,7 @@ def run(target_date: str | None = None, dry_run: bool = False) -> None:
             print(f"  scores: {snap['scores']}")
             print(f"  signals: {snap['available_signals']}")
             if snap["stress_index"] >= HIGH_STRESS_THRESHOLD:
-                print(f"  ⚠️  HIGH STRESS — alert would be sent")
+                print(f"  ⚠️  HIGH STRESS - alert would be sent")
             return
 
         store_snapshot(db, snap)

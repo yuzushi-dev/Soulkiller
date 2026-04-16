@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Personal Constructs — Kelly's Repertory Grid Framework.
+"""Soulkiller Personal Constructs - Kelly's Repertory Grid Framework.
 
 Identifies the subject's unique bipolar evaluative dimensions (personal constructs)
 from how he evaluates people, situations, and experiences.
@@ -33,7 +33,7 @@ SAMPLE_MESSAGES = 80
 
 CONSTRUCT_PROMPT = """You are a psychologist using George Kelly's Personal Construct Theory to analyze the subject's (Italian, 30s, tech worker) evaluative framework.
 
-Personal constructs are the BIPOLAR DIMENSIONS a person uses to construe their world. They are like the axes of their personal coordinate system for understanding everything. Examples: "competente—incompetente", "autentico—falso", "libero—costretto".
+Personal constructs are the BIPOLAR DIMENSIONS a person uses to construe their world. They are like the axes of their personal coordinate system for understanding everything. Examples: "competente-incompetente", "autentico-falso", "libero-costretto".
 
 Identify the subject's personal constructs from how he evaluates people, situations, projects, and experiences in his messages.
 
@@ -72,7 +72,7 @@ Guidelines:
 - pole_positive / pole_negative: in Italian
 - Evidence must quote or closely paraphrase his words
 - Look for: comparisons ("X e' piu'... di Y"), evaluations ("questo e'..."), preferences ("preferisco... non mi piace quando...")
-- Constructs are PERSONAL — they may not match standard psychological dimensions
+- Constructs are PERSONAL - they may not match standard psychological dimensions
 """
 
 

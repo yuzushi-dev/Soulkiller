@@ -7,7 +7,7 @@ spontaneous occurrence in the primary communication corpus.
 Cron: soulkiller:domain-prober, biweekly Wednesday 10:00 Europe/Rome
 
 Algorithm:
-  1. Load domain_probe_schedule — domains where last_probe_at > probe_interval_days
+  1. Load domain_probe_schedule - domains where last_probe_at > probe_interval_days
      AND mean observation count across domain facets < MIN_OBS_THRESHOLD
   2. Generate 2-3 targeted questions for the selected domain
   3. Schedule delivery across consecutive days via question_engine

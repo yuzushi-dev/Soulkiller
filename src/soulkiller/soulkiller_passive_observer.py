@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Passive Observer — extracts personality signals from session transcripts.
+"""Soulkiller Passive Observer - extracts personality signals from session transcripts.
 
 Scans OpenClaw relational-agent session transcripts for behavioral signals in the subject's messages
 and interaction patterns. Focuses on meta-signals (communication patterns,
@@ -31,7 +31,7 @@ MAX_SESSION_SIZE_MB = 3  # Skip session files larger than this
 RUN_TIMEOUT_SECONDS = 500  # 8+ minutes hard cap for the loop (cron timeout=600s, leave room for in-flight LLM)
 LLM_TIMEOUT_SECONDS = 120  # Per-call LLM timeout
 BATCH_SIZE = 10
-# Direct LLM model — NEVER route extractions through the relational agent session:
+# Direct LLM model - NEVER route extractions through the relational agent session:
 # doing so injects prompts into the main conversation and causes context bloat.
 PASSIVE_DEFAULT_MODEL = "google-aistudio/gemini-2.5-flash"
 
@@ -233,7 +233,7 @@ def build_passive_prompt(messages: list[dict[str, Any]], patterns: list[dict[str
 
     return f"""Analyze these interaction signals from the subject and extract personality/behavioral signals.
 Focus on META-SIGNALS: communication style, decision patterns, emotional tone, preferences expressed through behavior.
-Do NOT extract surface-level content (what they said) — extract HOW they said it and WHAT it reveals about personality.
+Do NOT extract surface-level content (what they said) - extract HOW they said it and WHAT it reveals about personality.
 
 Return STRICT JSON:
 {{

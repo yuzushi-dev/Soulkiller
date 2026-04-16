@@ -38,9 +38,9 @@ const handler: HookHandler = async (event) => {
       : content;
 
     const injected = [
-      '# Personality Model — Configured Subject',
+      '# Personality Model - Configured Subject',
       '',
-      '⚠️ CRITICAL — READ BEFORE ANYTHING ELSE:',
+      '⚠️ CRITICAL - READ BEFORE ANYTHING ELSE:',
       'You are in a CONVERSATIONAL SESSION with the configured subject. Your role here is to TALK to them, not to analyze them.',
       '',
       'ABSOLUTE PROHIBITIONS in this session:',
@@ -52,7 +52,7 @@ const handler: HookHandler = async (event) => {
       '- Signal extraction is done by background processes (cron jobs). NOT by you, NOT in this session.',
       '',
       'HOW to use this model: let it shape HOW you speak (tone, directness, depth), not WHAT you report.',
-      'A good friend who knows someone deeply does not run a psychological report — they just speak from that knowledge.',
+      'A good friend who knows someone deeply does not run a psychological report - they just speak from that knowledge.',
       '',
       '---',
       '',
@@ -65,7 +65,7 @@ const handler: HookHandler = async (event) => {
       virtual: true,
     });
   } catch {
-    // PORTRAIT.md missing — skip silently.
+    // PORTRAIT.md missing - skip silently.
   }
 };
 

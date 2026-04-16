@@ -14,7 +14,7 @@ The system models personality across 60 facets organized into 8 categories, each
 
 ### What it replaced
 
-The previous system used 5 generic topics (`priorita_reali`, `energia_stress`, `relazione_calibrazione`, `routine_benessere`, `stile_decisionale`) scored by a Topic Gap Score (TGS) formula, and `demo_profile.json` held 12 shallow operational records. Soulkiller replaces the 5-topic scorer with a 60-facet model while maintaining full backward compatibility — the old scorer remains as a fallback, and the profile JSON format is preserved and extended.
+The previous system used 5 generic topics (`priorita_reali`, `energia_stress`, `relazione_calibrazione`, `routine_benessere`, `stile_decisionale`) scored by a Topic Gap Score (TGS) formula, and `demo_profile.json` held 12 shallow operational records. Soulkiller replaces the 5-topic scorer with a 60-facet model while maintaining full backward compatibility - the old scorer remains as a fallback, and the profile JSON format is preserved and extended.
 
 ---
 
@@ -64,7 +64,7 @@ Telegram messages the configured subject
 
 3. **Bootstrap injection** (`soulkiller-bootstrap` hook, `agent:bootstrap`): On every agent session start, this hook reads `PROFILE.md` and injects it as a virtual `PERSONALITY_MODEL.md` bootstrap file. This gives all configured agents personality awareness without manual context injection. Sub-agents and internal soulkiller crons are excluded.
 
-4. **Extraction** (`soulkiller:extract` cron, every 2h): Reads new lines from `inbox.jsonl`, inserts them into the SQLite `inbox` table (deduplicating by `message_id`), then batches up to 20 unprocessed messages into LLM calls. The LLM analyzes each message for personality signals — what it reveals about cognitive style, emotional tendencies, communication preferences, etc. Extracted signals become `observations` in the database. The extractor also correlates incoming messages with pending check-in questions to capture replies. LLM calls have a 90-second timeout.
+4. **Extraction** (`soulkiller:extract` cron, every 2h): Reads new lines from `inbox.jsonl`, inserts them into the SQLite `inbox` table (deduplicating by `message_id`), then batches up to 20 unprocessed messages into LLM calls. The LLM analyzes each message for personality signals - what it reveals about cognitive style, emotional tendencies, communication preferences, etc. Extracted signals become `observations` in the database. The extractor also correlates incoming messages with pending check-in questions to capture replies. LLM calls have a 90-second timeout.
 
 5. **Active questioning** (`soulkiller:checkin` cron, every 30min 9-22h): The question engine scores all 60 facets and selects the one with the highest Facet Gap Score. A cron agent generates a natural-sounding question targeting that facet and sends it via Telegram. The exchange is recorded in `checkin_exchanges` and a `pending-checkin.json` signal file is written for the follow-up hook.
 
@@ -78,7 +78,7 @@ Telegram messages the configured subject
 
 ## 3. The 54-Facet Taxonomy
 
-Each facet is a dimension of personality modeled as a position on a spectrum between two poles. Three facets (`values.core_values`, `aesthetic.music_taste`, `meta_cognition.cognitive_biases`) are non-linear — they accumulate textual evidence lists instead of a numeric position.
+Each facet is a dimension of personality modeled as a position on a spectrum between two poles. Three facets (`values.core_values`, `aesthetic.music_taste`, `meta_cognition.cognitive_biases`) are non-linear - they accumulate textual evidence lists instead of a numeric position.
 
 ### Cognitive (6 facets)
 
@@ -178,9 +178,9 @@ Each facet is a dimension of personality modeled as a position on a spectrum bet
 
 Sensitivity controls how intrusive a question about that facet feels:
 
-- **bassa** (intrusion base 0.25): safe to ask anytime — aesthetic preferences, communication style
-- **media** (intrusion base 0.45): moderate — cognitive patterns, values, temporal habits
-- **alta** (intrusion base 0.65): deeply personal — emotional responses, trust, loyalty, boundaries
+- **bassa** (intrusion base 0.25): safe to ask anytime - aesthetic preferences, communication style
+- **media** (intrusion base 0.45): moderate - cognitive patterns, values, temporal habits
+- **alta** (intrusion base 0.65): deeply personal - emotional responses, trust, loyalty, boundaries
 
 The question engine factors sensitivity into its scoring so it avoids asking about high-sensitivity facets during spotlight mode or at bad times of day.
 
@@ -192,49 +192,49 @@ The question engine factors sensitivity into its scoring so it avoids asking abo
 
 ### Tables
 
-**`facets`** — The 54 personality dimensions (seed data, rarely changes)
-- `id` TEXT PK — e.g. `"cognitive.decision_speed"`
-- `category`, `name`, `description` — taxonomy metadata
-- `spectrum_low`, `spectrum_high` — the two poles (NULL for non-linear facets)
-- `sensitivity` — `bassa` / `media` / `alta`
-- `intrusion_base` — numeric intrusion cost for question scoring
+**`facets`** - The 54 personality dimensions (seed data, rarely changes)
+- `id` TEXT PK - e.g. `"cognitive.decision_speed"`
+- `category`, `name`, `description` - taxonomy metadata
+- `spectrum_low`, `spectrum_high` - the two poles (NULL for non-linear facets)
+- `sensitivity` - `bassa` / `media` / `alta`
+- `intrusion_base` - numeric intrusion cost for question scoring
 
-**`observations`** — Raw signals extracted from messages and sessions
+**`observations`** - Raw signals extracted from messages and sessions
 - `facet_id` FK, `source_type` (`passive_chat`, `session_behavioral`, `checkin_reply`)
-- `source_ref` — unique identifier for dedup (e.g. `inbox:tg-12345`, `session:abc:42`)
-- `content` — the raw text that was analyzed
-- `extracted_signal` — LLM's interpretation of what it reveals
-- `signal_strength` (0.0-1.0) — LLM's confidence in the observation
-- `signal_position` (0.0-1.0) — where on the spectrum (NULL for non-linear facets)
+- `source_ref` - unique identifier for dedup (e.g. `inbox:tg-12345`, `session:abc:42`)
+- `content` - the raw text that was analyzed
+- `extracted_signal` - LLM's interpretation of what it reveals
+- `signal_strength` (0.0-1.0) - LLM's confidence in the observation
+- `signal_position` (0.0-1.0) - where on the spectrum (NULL for non-linear facets)
 - UNIQUE constraint on `(facet_id, source_ref)` prevents duplicate extraction
 
-**`traits`** — Consolidated scores per facet (one row per facet, always exactly 54 rows)
-- `value_position` — weighted average position on the spectrum
-- `confidence` (0.0-1.0) — how sure the model is about this trait
-- `observation_count` — total observations supporting this trait
-- `last_observation_at`, `last_synthesis_at` — temporal tracking
-- `notes` — free-form synthesis notes or textual evidence for non-linear facets
+**`traits`** - Consolidated scores per facet (one row per facet, always exactly 54 rows)
+- `value_position` - weighted average position on the spectrum
+- `confidence` (0.0-1.0) - how sure the model is about this trait
+- `observation_count` - total observations supporting this trait
+- `last_observation_at`, `last_synthesis_at` - temporal tracking
+- `notes` - free-form synthesis notes or textual evidence for non-linear facets
 
-**`hypotheses`** — Cross-facet patterns discovered by the synthesizer
-- `hypothesis` — natural language description of the pattern
-- `status` — `unverified`, `confirmed`, `denied`, `nuanced`
-- `supporting_observations`, `contradicting_observations` — JSON arrays of observation IDs
+**`hypotheses`** - Cross-facet patterns discovered by the synthesizer
+- `hypothesis` - natural language description of the pattern
+- `status` - `unverified`, `confirmed`, `denied`, `nuanced`
+- `supporting_observations`, `contradicting_observations` - JSON arrays of observation IDs
 - `confidence` (0.0-1.0)
 
-**`checkin_exchanges`** — Question-reply tracking for active questioning
-- `facet_id` — which facet the question targeted
-- `question_text` — what was asked
-- `reply_text` — the subject's response (NULL until captured)
-- `asked_at`, `reply_captured_at` — timestamps
-- `message_id` — Telegram message ID for correlation
+**`checkin_exchanges`** - Question-reply tracking for active questioning
+- `facet_id` - which facet the question targeted
+- `question_text` - what was asked
+- `reply_text` - the subject's response (NULL until captured)
+- `asked_at`, `reply_captured_at` - timestamps
+- `message_id` - Telegram message ID for correlation
 
-**`inbox`** — Buffer for captured raw messages from the hook
-- `message_id` UNIQUE — deduplication key
+**`inbox`** - Buffer for captured raw messages from the hook
+- `message_id` UNIQUE - deduplication key
 - `content`, `from_id`, `channel_id`, `received_at`
-- `processed` flag + `processed_at` — tracks extraction status
+- `processed` flag + `processed_at` - tracks extraction status
 
-**`model_snapshots`** — Point-in-time snapshots for tracking model evolution
-- `snapshot_data` — full JSON dump of all traits
+**`model_snapshots`** - Point-in-time snapshots for tracking model evolution
+- `snapshot_data` - full JSON dump of all traits
 - `total_observations`, `avg_confidence`, `coverage_pct`
 
 ### Indexes
@@ -248,46 +248,46 @@ The question engine factors sensitivity into its scoring so it avoids asking abo
 
 The memory layer extends soulkiller.db with five new tables for episodic memory, communication metrics, and decision tracking.
 
-**`entities`** — People, places, projects, organizations mentioned by the subject
-- `entity_type` — `person`, `place`, `project`, `activity`, `organization`
-- `name` — identifier (UNIQUE with entity_type)
-- `label` — relationship label (compagna, amico, etc.)
-- `description` — accumulated description (appended on each mention)
-- `mention_count` — auto-incremented on duplicate insert
-- `first_seen_at`, `last_seen_at` — temporal tracking
+**`entities`** - People, places, projects, organizations mentioned by the subject
+- `entity_type` - `person`, `place`, `project`, `activity`, `organization`
+- `name` - identifier (UNIQUE with entity_type)
+- `label` - relationship label (compagna, amico, etc.)
+- `description` - accumulated description (appended on each mention)
+- `mention_count` - auto-incremented on duplicate insert
+- `first_seen_at`, `last_seen_at` - temporal tracking
 
-**`episodes`** — Facts, events, habits, preferences, opinions extracted from conversations
-- `episode_type` — `fact`, `event`, `habit`, `preference`, `opinion`
-- `content` — the extracted information
-- `source_type` — `dump_import`, `passive_chat`, `checkin_reply`
-- `source_ref` — unique dedup key (UNIQUE with episode_type)
-- `confidence` — extraction confidence (0.0-1.0)
-- `occurred_at` — when the event/fact happened (if temporal cues present)
-- `entity_names` — JSON array of related entity names
-- `active` — 0 when superseded by newer information
-- `superseded_by` — FK to the newer episode that replaced this one
+**`episodes`** - Facts, events, habits, preferences, opinions extracted from conversations
+- `episode_type` - `fact`, `event`, `habit`, `preference`, `opinion`
+- `content` - the extracted information
+- `source_type` - `dump_import`, `passive_chat`, `checkin_reply`
+- `source_ref` - unique dedup key (UNIQUE with episode_type)
+- `confidence` - extraction confidence (0.0-1.0)
+- `occurred_at` - when the event/fact happened (if temporal cues present)
+- `entity_names` - JSON array of related entity names
+- `active` - 0 when superseded by newer information
+- `superseded_by` - FK to the newer episode that replaced this one
 
-**`entity_relations`** — How the subject relates to each entity (especially people)
+**`entity_relations`** - How the subject relates to each entity (especially people)
 - `entity_id` FK → entities
-- `relation_type` — compagna, amico, famiglia, collega, etc.
-- `dynamic` — relationship dynamic (protettivo, giocoso, formale, etc.)
-- `sentiment` — -1.0 (negative) to 1.0 (positive)
-- `evidence` — supporting quotes
+- `relation_type` - compagna, amico, famiglia, collega, etc.
+- `dynamic` - relationship dynamic (protettivo, giocoso, formale, etc.)
+- `sentiment` - -1.0 (negative) to 1.0 (positive)
+- `evidence` - supporting quotes
 
-**`communication_metrics`** — Programmatic metrics computed without LLM
-- `platform`, `chat_id` — which conversation
-- `period` — `all` or `YYYY-MM` for monthly breakdowns
-- `metric_type` — `response_time`, `msg_length`, `activity_hours`, `punctuation`, `burst_pattern`, `vocabulary`
-- `metric_data` — JSON with computed values
-- `sample_size` — number of messages analyzed
+**`communication_metrics`** - Programmatic metrics computed without LLM
+- `platform`, `chat_id` - which conversation
+- `period` - `all` or `YYYY-MM` for monthly breakdowns
+- `metric_type` - `response_time`, `msg_length`, `activity_hours`, `punctuation`, `burst_pattern`, `vocabulary`
+- `metric_data` - JSON with computed values
+- `sample_size` - number of messages analyzed
 - UNIQUE on (platform, chat_id, period, metric_type)
 
-**`decisions`** — Decisions tracked for coherence analysis against personality traits
-- `decision` — what was decided
-- `domain` — `lavoro`, `relazioni`, `finanza`, `salute`, `lifestyle`, `tech`
-- `facet_ids` — JSON array of linked personality facet IDs
-- `direction` — towards which spectrum pole
-- `source_ref` — unique dedup key
+**`decisions`** - Decisions tracked for coherence analysis against personality traits
+- `decision` - what was decided
+- `domain` - `lavoro`, `relazioni`, `finanza`, `salute`, `lifestyle`, `tech`
+- `facet_ids` - JSON array of linked personality facet IDs
+- `direction` - towards which spectrum pole
+- `source_ref` - unique dedup key
 
 ### Memory Layer Indexes
 
@@ -344,14 +344,14 @@ The JSONL inbox file is append-only. Deduplication happens at the database level
 Fires on every agent session start. Reads `$SOULKILLER_DATA_DIR/PROFILE.md` and injects it as a virtual bootstrap file named `PERSONALITY_MODEL.md` into the agent's context.
 
 **Exclusions**:
-- Sub-agent sessions (agent name contains `:subagent:`) — they inherit from the parent
-- Internal soulkiller crons (session prompt contains `soulkiller_`) — prevents circular personality injection during extraction/synthesis
+- Sub-agent sessions (agent name contains `:subagent:`) - they inherit from the parent
+- Internal soulkiller crons (session prompt contains `soulkiller_`) - prevents circular personality injection during extraction/synthesis
 
 If `PROFILE.md` doesn't exist or is empty, the hook silently skips injection.
 
 ### 5.2 Extractor (`soulkiller_extractor.py`)
 
-**Cron**: `soulkiller:extract` — every 2 hours at `:15`
+**Cron**: `soulkiller:extract` - every 2 hours at `:15`
 **LLM calls**: max 2 batches of 10 messages = max 2 LLM calls per run
 
 The extractor is the primary pipeline stage that turns raw messages into structured personality observations. Its execution flow:
@@ -361,22 +361,22 @@ The extractor is the primary pipeline stage that turns raw messages into structu
 2. **Batch**: Fetches up to 10 unprocessed messages from the `inbox` table (ordered by `received_at` ASC). Runs at most 2 batches per invocation, capping at 20 messages per run.
 
 3. **Extract**: Sends the batch to the LLM with a structured prompt listing all 60 facets and their spectrums. The LLM returns a JSON array of signals, each containing:
-   - `message_index` — which message in the batch
-   - `facet_id` — which personality facet this relates to
-   - `extracted_signal` — what the message reveals
-   - `signal_strength` — confidence (filtered at >= 0.4)
-   - `signal_position` — where on the spectrum (omitted for non-linear facets)
+   - `message_index` - which message in the batch
+   - `facet_id` - which personality facet this relates to
+   - `extracted_signal` - what the message reveals
+   - `signal_strength` - confidence (filtered at >= 0.4)
+   - `signal_position` - where on the spectrum (omitted for non-linear facets)
 
 4. **Insert**: Each valid signal becomes an observation in the database. Invalid facet IDs (FK constraint violation) are silently skipped. The observation's `source_ref` is `inbox:{message_id}` for deduplication.
 
-5. **Correlate replies**: For each batch, the extractor checks if there are pending check-in exchanges (questions asked within the last 4 hours with no reply captured). If exactly one pending exchange exists, it runs a lightweight LLM YES/NO match to determine if any incoming message is a reply to that question. If multiple exchanges are pending, it logs the ambiguity and does not auto-link — this prevents misattribution.
+5. **Correlate replies**: For each batch, the extractor checks if there are pending check-in exchanges (questions asked within the last 4 hours with no reply captured). If exactly one pending exchange exists, it runs a lightweight LLM YES/NO match to determine if any incoming message is a reply to that question. If multiple exchanges are pending, it logs the ambiguity and does not auto-link - this prevents misattribution.
 
 6. **Mark processed**: After extraction, all processed inbox entries get `processed = 1`.
 
 ### 5.3 Question Engine (`soulkiller_question_engine.py`)
 
 **Called by**: `soulkiller:checkin` cron (every 30 minutes, 9-22h)
-**No LLM calls** — pure algorithmic scoring
+**No LLM calls** - pure algorithmic scoring
 
 The question engine replaces the old `soulkiller_topic_gap_score.py`. It scores all 60 facets using the Facet Gap Score formula:
 
@@ -424,7 +424,7 @@ The engine checks both the `checkin_exchanges` table in SQLite and the legacy `h
 }
 ```
 
-`selected_topic` and `selected_facet` are identical — the former exists for backward compatibility with the cron prompt format.
+`selected_topic` and `selected_facet` are identical - the former exists for backward compatibility with the cron prompt format.
 
 **Fallback**: If the SQLite database is inaccessible (corrupted, missing, migration in progress), the engine automatically falls back to the legacy 5-topic scorer by dynamically importing `soulkiller_topic_gap_score.py`. The output includes `"engine": "legacy_fallback"` so downstream consumers know which engine ran.
 
@@ -441,7 +441,7 @@ The cron agent executes a 6-step process:
 
 3. **Read context**: Reads `demo_profile.json` and `PROFILE.md` (if it exists) for personality context.
 
-4. **Compose message**: Using the `selected_facet` and `question_hint`, composes a short Italian message (max 1-2 sentences, under 120 characters) that sounds like a friend texting — concrete, specific, no abstractions or coaching language. Explicitly avoids binary "A or B?" quiz-style questions.
+4. **Compose message**: Using the `selected_facet` and `question_hint`, composes a short Italian message (max 1-2 sentences, under 120 characters) that sounds like a friend texting - concrete, specific, no abstractions or coaching language. Explicitly avoids binary "A or B?" quiz-style questions.
 
 5. **Send**: Delivers via `openclaw message send --channel telegram --target demo-subject`.
 
@@ -449,11 +449,11 @@ The cron agent executes a 6-step process:
 
 ### 5.5 Passive Observer (`soulkiller_passive_observer.py`)
 
-**Cron**: `soulkiller:passive-scan` — every 6 hours at `:45`
+**Cron**: `soulkiller:passive-scan` - every 6 hours at `:45`
 **LLM calls**: 1 per session with new messages (capped at 20 messages total per run)
 **Safety limits**: 3MB max session file size, 10 messages per session, 4-minute run timeout, 90-second per-call LLM timeout
 
-The passive observer complements the inbox extractor by analyzing behavioral patterns in agent interaction sessions rather than raw Telegram messages. It looks for meta-signals — not what the subject says, but how he interacts:
+The passive observer complements the inbox extractor by analyzing behavioral patterns in agent interaction sessions rather than raw Telegram messages. It looks for meta-signals - not what the subject says, but how he interacts:
 
 - **Communication patterns**: message length, response style, language switching
 - **Decision signals**: when he accepts or rejects agent suggestions, what reasoning he provides
@@ -470,7 +470,7 @@ The passive observer complements the inbox extractor by analyzing behavioral pat
 
 ### 5.6 Synthesizer (`soulkiller_synthesizer.py`)
 
-**Cron**: `soulkiller:synthesize` — daily at 03:00 Europe/Rome
+**Cron**: `soulkiller:synthesize` - daily at 03:00 Europe/Rome
 **LLM calls**: max 1 per day (for hypothesis generation)
 
 The synthesizer consolidates raw observations into the trait model. It runs in three phases:
@@ -482,21 +482,21 @@ For each facet with new observations since the last synthesis:
 - **Value position** (linear facets): Weighted average of `signal_position` values, weighted by `signal_strength * recency_weight`. Recency uses exponential decay with a 14-day half-life: `weight = e^(-0.693 * days_old / 14)`. Recent observations dominate older ones.
 
 - **Confidence**: `min(1.0, base_count_conf * consistency_factor)` where:
-  - `base_count_conf = 1 - e^(-observation_count / 8)` — plateaus around 15 observations, reaching ~0.85 at 15 obs
-  - `consistency_factor = 1 - stdev(signal_positions)` — penalizes contradictory observations. If all observations agree (stdev=0), factor is 1.0. High disagreement (stdev=0.4) drops it to 0.6.
+  - `base_count_conf = 1 - e^(-observation_count / 8)` - plateaus around 15 observations, reaching ~0.85 at 15 obs
+  - `consistency_factor = 1 - stdev(signal_positions)` - penalizes contradictory observations. If all observations agree (stdev=0), factor is 1.0. High disagreement (stdev=0.4) drops it to 0.6.
   - For non-linear facets (no positions): `consistency_factor = 0.6` (moderate confidence from count alone)
   - Single observation: `consistency_factor = 0.8`
 
-- **Non-linear facets** (`core_values`, `music_taste`, `cognitive_biases`): Instead of computing a numeric position, the synthesizer accumulates textual evidence — counting recurring labels from `extracted_signal` fields, sorting by frequency, and storing the top 10 as notes. Confidence is still computed from observation count and evidence stability.
+- **Non-linear facets** (`core_values`, `music_taste`, `cognitive_biases`): Instead of computing a numeric position, the synthesizer accumulates textual evidence - counting recurring labels from `extracted_signal` fields, sorting by frequency, and storing the top 10 as notes. Confidence is still computed from observation count and evidence stability.
 
 **Phase 2: Hypothesis generation**
 
 If any facets were updated, the synthesizer sends the top 10 traits (by observation count) to the LLM with a prompt requesting 1-3 cross-facet patterns. Examples of hypotheses:
 
 - "Under deadline pressure, decision speed shifts from deliberate to fast"
-- "Social energy correlates with creative output — more introverted phases produce higher code quality"
+- "Social energy correlates with creative output - more introverted phases produce higher code quality"
 
-Existing hypotheses are also sent for review, with the LLM updating their status (`unverified` -> `confirmed`/`denied`/`nuanced`) based on new evidence. This is a single LLM call per day — the most expensive operation in the system.
+Existing hypotheses are also sent for review, with the LLM updating their status (`unverified` -> `confirmed`/`denied`/`nuanced`) based on new evidence. This is a single LLM call per day - the most expensive operation in the system.
 
 **Phase 3: Snapshot**
 
@@ -504,7 +504,7 @@ Saves a `model_snapshots` row with the full trait dump (JSON), total observation
 
 ### 5.7 Profile Bridge (`soulkiller_profile_bridge.py`)
 
-**Cron**: `soulkiller:profile-sync` — daily at 03:30 Europe/Rome (after synthesis)
+**Cron**: `soulkiller:profile-sync` - daily at 03:30 Europe/Rome (after synthesis)
 **No LLM calls**
 
 The bridge maintains backward compatibility with existing operational protocols that read `demo_profile.json`. It performs two operations:
@@ -528,7 +528,7 @@ For traits with confidence >= 0.3:
 
 For traits that drop below 0.3 confidence -> mark existing records as `stato: "da_verificare"`.
 
-Records with `fonte` not starting with `soulkiller:` are preserved untouched — the 12 original operational records remain intact. The schema version bumps from `1.1` to `1.2`, adding an optional `soulkiller_facet_id` field on soulkiller-sourced records.
+Records with `fonte` not starting with `soulkiller:` are preserved untouched - the 12 original operational records remain intact. The schema version bumps from `1.1` to `1.2`, adding an optional `soulkiller_facet_id` field on soulkiller-sourced records.
 
 **PROFILE.md generation**: Creates a human-readable Markdown file at `$SOULKILLER_DATA_DIR/PROFILE.md` with:
 - Header with coverage stats (e.g., "34/60 facets, 74%, avg confidence 0.62")
@@ -538,8 +538,8 @@ Records with `fonte` not starting with `soulkiller:` are preserved untouched —
 
 ### 5.8 Memory Layer (`soulkiller_memory.py`)
 
-**No cron** — invoked via `soulkiller_dump_import.py extract-memory` and `compute-metrics` commands
-**LLM calls**: Same pattern as personality extraction — 1 per batch of conversation windows
+**No cron** - invoked via `soulkiller_dump_import.py extract-memory` and `compute-metrics` commands
+**LLM calls**: Same pattern as personality extraction - 1 per batch of conversation windows
 
 The memory layer complements personality trait extraction by capturing *factual* information from the same conversation windows. While personality extraction answers "how does the subject think?", memory extraction answers "what does the subject know/do/decide?".
 
@@ -575,16 +575,16 @@ After accumulating >= 3 decisions per domain, the function cross-references each
 **Memory Summary** (`get_memory_summary()` / `get_full_memory_summary()`):
 
 Two summary functions are available for programmatic access:
-- `soulkiller_memory.get_memory_summary()` — returns counts for entities (by type), episodes (by type), decisions (by domain), relations, and chats with metrics
-- `soulkiller_db.get_full_memory_summary()` — combines the personality model summary with memory layer counts in a single dict
+- `soulkiller_memory.get_memory_summary()` - returns counts for entities (by type), episodes (by type), decisions (by domain), relations, and chats with metrics
+- `soulkiller_db.get_full_memory_summary()` - combines the personality model summary with memory layer counts in a single dict
 
 **State Tracking**:
 
 Memory extraction uses independent status columns on the `windows` table in `import_state.db`:
-- `memory_status` — `pending`, `extracting`, `extracted`, `failed`
-- `memory_extracted_at` — timestamp of extraction
-- `memory_signals_count` — total signals extracted
-- `memory_error_message` — error details if failed
+- `memory_status` - `pending`, `extracting`, `extracted`, `failed`
+- `memory_extracted_at` - timestamp of extraction
+- `memory_signals_count` - total signals extracted
+- `memory_error_message` - error details if failed
 
 These columns are added via migration-safe `ALTER TABLE` (checks if column exists before adding). This allows `extract` (personality) and `extract-memory` to operate independently on the same windows.
 
@@ -592,28 +592,28 @@ These columns are added via migration-safe `ALTER TABLE` (checks if column exist
 
 Added by `soulkiller_migrate_v2.py`. Store outputs of 8 specialized psychological analyzers.
 
-**`liwc_metrics`** — Weekly LIWC-style psycholinguistic profiles (no LLM, Pennebaker)
-- `period` UNIQUE — ISO week `YYYY-WW`
+**`liwc_metrics`** - Weekly LIWC-style psycholinguistic profiles (no LLM, Pennebaker)
+- `period` UNIQUE - ISO week `YYYY-WW`
 - `i_ratio`, `we_ratio`, `negative_affect`, `positive_affect`, `cognitive_complexity`, etc.
 
-**`stress_snapshots`** — Weekly composite stress index (no LLM)
+**`stress_snapshots`** - Weekly composite stress index (no LLM)
 - `period` UNIQUE, `stress_index` (0-1), `stress_level`, `dominant_signal`
 
-**`schemas`** — Young's Early Maladaptive Schemas + Vaillant defense mechanisms
-- `schema_name` UNIQUE — one record per schema/defense, updated in place
+**`schemas`** - Young's Early Maladaptive Schemas + Vaillant defense mechanisms
+- `schema_name` UNIQUE - one record per schema/defense, updated in place
 - `schema_domain`: `disconnection|impaired_autonomy|impaired_limits|other_directedness|overvigilance` (EMS) or `defense_mechanism` (Vaillant)
 - `activation_level` (0-1), `confidence`, `trigger_contexts`, `behavioral_signatures`, `evidence`
 
-**`goals`** — Active goal hierarchy (Little/Klinger)
+**`goals`** - Active goal hierarchy (Little/Klinger)
 - UNIQUE(`goal_text`, `domain`), `horizon`, `priority_rank`, `progress`, `status`, `conflicts_with`
 
-**`sdt_satisfaction`** — SDT needs per domain per month (Deci & Ryan)
+**`sdt_satisfaction`** - SDT needs per domain per month (Deci & Ryan)
 - UNIQUE(`period`, `domain`), `autonomy_satisfaction`, `competence_satisfaction`, `relatedness_satisfaction`
 
-**`attachment_signals`** — ECR-R attachment per relationship context
+**`attachment_signals`** - ECR-R attachment per relationship context
 - UNIQUE(`relationship_context`), `anxiety_level`, `avoidance_level`, `secure_behaviors`, `anxious_behaviors`, `avoidant_behaviors`
 
-**`caps_signatures`** — CAPS if-then situational signatures (Mischel & Shoda)
+**`caps_signatures`** - CAPS if-then situational signatures (Mischel & Shoda)
 - UNIQUE(`situation_type`), `behavioral_response`, `emotional_response`, `confidence`
 
 ### 8 New Facets (v2.0, total: 54)
@@ -644,21 +644,21 @@ Added by `soulkiller_migrate_v2.py`. Store outputs of 8 specialized psychologica
 
 Five new tables store specialized data for the Tier 1 cognitive constructs.
 
-**`idiolect_profile`** — Programmatic linguistic fingerprint (TTR, sentence stats, style markers, top n-grams). One row per period (`YYYY-MM` or `all`). `UNIQUE(period)`.
+**`idiolect_profile`** - Programmatic linguistic fingerprint (TTR, sentence stats, style markers, top n-grams). One row per period (`YYYY-MM` or `all`). `UNIQUE(period)`.
 
-**`appraisal_patterns`** — Per-domain emotional appraisal profiles (Lazarus/Scherer). Fields: `novelty_sensitivity`, `goal_relevance_weight`, `coping_potential_default`, `agency_attribution`, `norm_compatibility_weight`. `UNIQUE(domain)`.
+**`appraisal_patterns`** - Per-domain emotional appraisal profiles (Lazarus/Scherer). Fields: `novelty_sensitivity`, `goal_relevance_weight`, `coping_potential_default`, `agency_attribution`, `norm_compatibility_weight`. `UNIQUE(domain)`.
 
-**`mental_model_patterns`** — Per-domain cognitive representation analysis (Johnson-Laird). Fields: `representation_style` (spatial/propositional/narrative/mixed), `model_complexity` (minimal/moderate/exhaustive), `counterfactual_frequency`, `analogy_preference`. `UNIQUE(domain)`.
+**`mental_model_patterns`** - Per-domain cognitive representation analysis (Johnson-Laird). Fields: `representation_style` (spatial/propositional/narrative/mixed), `model_complexity` (minimal/moderate/exhaustive), `counterfactual_frequency`, `analogy_preference`. `UNIQUE(domain)`.
 
-**`dual_process_profile`** — Per-domain System 1/2 balance (Kahneman). Fields: `system1_dominance` (0-1), `override_frequency`, `default_mode`, `evidence`. Also stores programmatic markers globally: self-correction, deliberation, and snap judgment rates per 1000 words. `UNIQUE(domain)`.
+**`dual_process_profile`** - Per-domain System 1/2 balance (Kahneman). Fields: `system1_dominance` (0-1), `override_frequency`, `default_mode`, `evidence`. Also stores programmatic markers globally: self-correction, deliberation, and snap judgment rates per 1000 words. `UNIQUE(domain)`.
 
-**`personal_constructs`** — Kelly's repertory grid dimensions. Fields: `pole_positive`, `pole_negative`, `superordinate` (bool), `range_of_convenience` (JSON array), `permeability` (0-1), `usage_frequency` (0-1), `evidence`. `UNIQUE(construct_name)`.
+**`personal_constructs`** - Kelly's repertory grid dimensions. Fields: `pole_positive`, `pole_negative`, `superordinate` (bool), `range_of_convenience` (JSON array), `permeability` (0-1), `usage_frequency` (0-1), `evidence`. `UNIQUE(construct_name)`.
 
 ---
 
 ## 6. Scoring Formulas
 
-### Facet Gap Score (FGS) — question selection
+### Facet Gap Score (FGS) - question selection
 
 ```
 FGS = 0.40 * (1.0 - confidence)
@@ -719,7 +719,7 @@ A 14-day-old observation has half the weight of a fresh one. A 28-day-old observ
 | `soulkiller_passive_observer.py` | Session transcript scanning, behavioral meta-signal extraction |
 | `soulkiller_synthesizer.py` | Trait consolidation, confidence computation, LLM hypothesis generation |
 | `soulkiller_profile_bridge.py` | JSON profile sync, PROFILE.md generation |
-| `soulkiller_portrait.py` | Full portrait synthesis — integrates all constructs into a narrative PORTRAIT.md |
+| `soulkiller_portrait.py` | Full portrait synthesis - integrates all constructs into a narrative PORTRAIT.md |
 | `soulkiller_decisions.py` | Decision extraction from inbox for coherence analysis |
 | `soulkiller_reply_extractor.py` | Check-in reply → observation extraction |
 | `soulkiller_entity_extractor.py` | Entity + relation extraction from inbox |

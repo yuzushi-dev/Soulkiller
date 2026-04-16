@@ -117,8 +117,8 @@ new pattern to watch for, add it there.
 
 1. Fork the repo and create a branch from `main`
 2. Make your changes
-3. Run `python -m pytest tests/ -v` — all tests must pass
-4. Run `python -m soulkiller.demo_runner --output-dir /tmp/sk_demo` — demo must complete
+3. Run `python -m pytest tests/ -v` - all tests must pass
+4. Run `python -m soulkiller.demo_runner --output-dir /tmp/sk_demo` - demo must complete
 5. Open a PR against `main` with a description of what and why
 
 There is no formal style guide. Match the style of the file you are editing.

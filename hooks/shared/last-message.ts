@@ -1,5 +1,5 @@
 /**
- * Last User Message — reads inbox.jsonl and returns the most recent message
+ * Last User Message - reads inbox.jsonl and returns the most recent message
  * from the configured demo subject, for use as SMELT retrieval query.
  */
 

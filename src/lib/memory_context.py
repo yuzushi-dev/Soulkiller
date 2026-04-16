@@ -1,16 +1,16 @@
-"""memory_context — Soulkiller native operational memory layer.
+"""memory_context - Soulkiller native operational memory layer.
 
 Builds a compact, psychologically-grounded context bundle for agent sessions
 by reading directly from Soulkiller's analytical database.
 
 Sources (in priority order):
-  hypotheses      — cross-facet behavioral patterns, confidence-scored
-  traits          — personality facet positions with observation count
-  entities        — active people/projects/tools
-  model_snapshots — latest synthesis state and drift alerts
+  hypotheses      - cross-facet behavioral patterns, confidence-scored
+  traits          - personality facet positions with observation count
+  entities        - active people/projects/tools
+  model_snapshots - latest synthesis state and drift alerts
 
 Design principles:
-  - Never raw decisions or episodes — those are analytical inputs, not
+  - Never raw decisions or episodes - those are analytical inputs, not
     operational outputs
   - Max 12-15 items per session, ordered by psychological salience
   - Every item carries provenance (which table, which id, confidence)
@@ -529,7 +529,7 @@ class MemoryContextBuilder:
 
 
 # ---------------------------------------------------------------------------
-# SoulkillerMemoryProvider — implements MemoryProvider protocol
+# SoulkillerMemoryProvider - implements MemoryProvider protocol
 # ---------------------------------------------------------------------------
 
 class SoulkillerMemoryProvider:
@@ -593,7 +593,7 @@ class SoulkillerMemoryProvider:
         title: str = "",
         importance: float = 0.5,
     ) -> None:
-        # Not applicable for native Soulkiller provider — summaries are
+        # Not applicable for native Soulkiller provider - summaries are
         # managed by soulkiller_synthesizer
         pass
 

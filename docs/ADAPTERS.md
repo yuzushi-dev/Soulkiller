@@ -3,13 +3,13 @@
 Soulkiller's extraction, check-in, and synthesis crons all call an LLM via
 `ProviderLLMClient` in `src/lib/provider_llm_client.py`. The client dispatches
 to the correct backend based on `SOULKILLER_PROVIDER` (or inferred from the
-model name). No code changes needed — just set env vars.
+model name). No code changes needed - just set env vars.
 
 ---
 
 ## Quick setup
 
-### Ollama — recommended (local, no API key, no extra deps)
+### Ollama - recommended (local, no API key, no extra deps)
 
 The default provider. Works with any model you have pulled locally.
 No API key. No Python SDK. All network calls use stdlib `urllib`.
@@ -29,7 +29,7 @@ OLLAMA_BASE_URL=http://localhost:11434   # default, can omit
 ```
 
 If `SOULKILLER_PROVIDER` is not set and the model name is not recognized,
-Ollama is the fallback — so `SOULKILLER_MODEL=llama3` alone is enough.
+Ollama is the fallback - so `SOULKILLER_MODEL=llama3` alone is enough.
 
 ### Anthropic (Claude)
 
@@ -78,7 +78,7 @@ model name:
 | `claude-*` | `anthropic` |
 | `gpt-*`, `o1-*`, `o3-*`, `o4-*` | `openai` |
 | `llama*`, `mistral*`, `gemma*`, `phi*`, `qwen*`, `deepseek*` | `ollama` |
-| anything else | error — set `SOULKILLER_PROVIDER` explicitly |
+| anything else | error - set `SOULKILLER_PROVIDER` explicitly |
 
 ---
 
@@ -91,7 +91,7 @@ model name:
 | `soulkiller:passive-scan` | Extract behavioral meta-signals from session transcripts | 600–1200 tokens |
 | `soulkiller:synthesize` | Cross-facet hypothesis generation from accumulated observations | 800–2000 tokens |
 
-`soulkiller:profile-sync` does not call the LLM — it formats existing data.
+`soulkiller:profile-sync` does not call the LLM - it formats existing data.
 
 ---
 

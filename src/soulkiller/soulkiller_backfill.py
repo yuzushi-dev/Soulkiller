@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Backfill — dump import + profile import + deduplication.
+"""Soulkiller Backfill - dump import + profile import + deduplication.
 
 Steps:
   1. Load telegram dump messages into inbox (dedup by message_id)
@@ -57,7 +57,7 @@ def step1_load_dump(db, dry_run: bool) -> None:
     log("=== STEP 1: Load dump messages into inbox ===")
 
     if not DUMP_PATH.exists():
-        log(f"  SKIP — dump not found: {DUMP_PATH}")
+        log(f"  SKIP - dump not found: {DUMP_PATH}")
         return
 
     with open(DUMP_PATH, encoding="utf-8") as f:
@@ -145,7 +145,7 @@ def step2_import_profile(db, dry_run: bool) -> None:
     log("=== STEP 2: Import subject_profile.json records ===")
 
     if not PROFILE_PATH.exists():
-        log(f"  SKIP — profile not found: {PROFILE_PATH}")
+        log(f"  SKIP - profile not found: {PROFILE_PATH}")
         return
 
     with open(PROFILE_PATH, encoding="utf-8") as f:
@@ -269,7 +269,7 @@ def step3_dedup_entities(db, dry_run: bool) -> None:
 
         if not dry_run:
             for dup in to_merge:
-                # Reassign relations to canonical — delete first where source_ref already exists on canonical
+                # Reassign relations to canonical - delete first where source_ref already exists on canonical
                 existing_refs = set(
                     r[0] for r in db.execute(
                         "SELECT source_ref FROM entity_relations WHERE entity_id=?",

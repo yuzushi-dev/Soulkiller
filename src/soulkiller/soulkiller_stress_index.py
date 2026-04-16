@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Stress Index — Indice composito settimanale di stress.
+"""Soulkiller Stress Index - Indice composito settimanale di stress.
 
 Segnali: negative_affect (LIWC), frequenza messaggi, spesa impulsiva (budget).
 Baseline calcolata sulla mediana storica di ogni segnale.
@@ -76,7 +76,7 @@ def _z_score_cert(cur_cert: float, all_cert_values: list[float]) -> float:
     # Use last 13 periods as proxy for ~90 days (monthly periods)
     recent = all_cert_values[-13:]
     if len(recent) < 4:
-        return 0.0  # insufficient baseline — caller will fall back
+        return 0.0  # insufficient baseline - caller will fall back
     mu = statistics.mean(recent)
     try:
         sigma = statistics.stdev(recent)
@@ -124,7 +124,7 @@ def compute_stress(week: str, db) -> dict | None:
         # Map z to [-1, 1] range (clip at ±3σ), positive = more rigid than usual = stress
         cert_delta = max(-1.0, min(1.0, z / 3.0))
     else:
-        # Insufficient baseline — fall back to raw delta
+        # Insufficient baseline - fall back to raw delta
         cert_delta = (cur_cert - baseline_cert) / (baseline_cert + 0.1)
 
     # Weighted composite

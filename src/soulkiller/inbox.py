@@ -24,7 +24,7 @@ from pathlib import Path
 def append_to_inbox(data_dir: str | Path | None, entry: dict) -> None:
     """Append a JSON entry as a newline to inbox.jsonl inside data_dir.
 
-    Silently skips if data_dir is empty or None — safe to call even when
+    Silently skips if data_dir is empty or None - safe to call even when
     the runtime data directory is not configured.
     """
     if not data_dir:

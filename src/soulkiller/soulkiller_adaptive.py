@@ -4,12 +4,12 @@ Soulkiller Adaptive Layer
 
 Four mechanisms adapted from Tem Anima (temm1e-labs/temm1e):
 
-1. Confidence decay      — facets not observed recently lose confidence
+1. Confidence decay      - facets not observed recently lose confidence
                            using their per-category half_life_days
-2. Adaptive N            — extraction interval grows when profile is stable,
+2. Adaptive N            - extraction interval grows when profile is stable,
                            shrinks when profile is volatile (delta-based)
-3. Trust asymmetry       — relational.trust_formation degrades 3x faster than it builds
-4. Relationship phase    — 4-state machine: Discovery → Calibration → Partnership → Deep Partnership
+3. Trust asymmetry       - relational.trust_formation degrades 3x faster than it builds
+4. Relationship phase    - 4-state machine: Discovery → Calibration → Partnership → Deep Partnership
 
 Design principle: pure functions for all logic that doesn't touch the DB,
 so they're trivially testable. DB-touching functions are thin wrappers.
@@ -28,7 +28,7 @@ from typing import Any
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-CONFIDENCE_FLOOR = 0.05      # Minimum confidence — facet never fully disappears
+CONFIDENCE_FLOOR = 0.05      # Minimum confidence - facet never fully disappears
 TRUST_FACET = "relational.trust_formation"
 TRUST_DAMPEN_RISE = 0.3      # Trust-building signals applied at 30% strength
 
@@ -97,14 +97,14 @@ def save_state(state: dict[str, Any], path: Path | None = None) -> None:
     p.write_text(json.dumps(state, indent=2), encoding="utf-8")
 
 
-# ── Adaptive N — pure functions ────────────────────────────────────────────────
+# ── Adaptive N - pure functions ────────────────────────────────────────────────
 
 def compute_next_interval(delta: float) -> float:
     """
     Returns the next extraction interval in hours based on profile delta.
 
-    delta >= DELTA_HIGH (0.10) → INTERVAL_MIN_H (2h)   — volatile, extract often
-    delta <= DELTA_LOW  (0.04) → INTERVAL_MAX_H (8h)   — stable, save LLM calls
+    delta >= DELTA_HIGH (0.10) → INTERVAL_MIN_H (2h)   - volatile, extract often
+    delta <= DELTA_LOW  (0.04) → INTERVAL_MAX_H (8h)   - stable, save LLM calls
     Between → linear interpolation
     """
     if delta >= DELTA_HIGH:
@@ -134,7 +134,7 @@ def should_skip_run(state: dict[str, Any], now: datetime | None = None) -> bool:
         return False
 
 
-# ── Confidence decay — pure + DB ──────────────────────────────────────────────
+# ── Confidence decay - pure + DB ──────────────────────────────────────────────
 
 def decay_confidence(
     confidence: float,
@@ -161,7 +161,7 @@ def apply_confidence_decay(
 ) -> dict[str, float]:
     """
     Applies half-life confidence decay to all traits not observed today.
-    Updates the DB directly (does NOT commit — caller must commit).
+    Updates the DB directly (does NOT commit - caller must commit).
     Returns {facet_id: new_confidence} for every trait that changed.
     """
     now = now or datetime.now(timezone.utc)
@@ -192,7 +192,7 @@ def apply_confidence_decay(
             continue
 
         if days_elapsed < 1.0:
-            continue  # Observed today — no decay
+            continue  # Observed today - no decay
 
         new_conf = decay_confidence(confidence, days_elapsed, half_life)
         if abs(new_conf - confidence) < 0.001:
@@ -229,7 +229,7 @@ def compute_delta(
     return sum(abs(after[f] - before[f]) for f in common) / len(common)
 
 
-# ── Trust asymmetry — pure ────────────────────────────────────────────────────
+# ── Trust asymmetry - pure ────────────────────────────────────────────────────
 
 def adjust_trust_signal_strength(
     signal_position: float,
@@ -252,7 +252,7 @@ def adjust_trust_signal_strength(
     return signal_strength
 
 
-# ── Relationship phase — pure ──────────────────────────────────────────────────
+# ── Relationship phase - pure ──────────────────────────────────────────────────
 
 def compute_phase(
     current_phase: str,
@@ -344,7 +344,7 @@ def advance_phase(
 ) -> tuple[str, bool]:
     """
     Reads phase metrics from DB, computes new phase, returns (new_phase, changed).
-    Does not mutate state — caller updates state.
+    Does not mutate state - caller updates state.
     """
     current_phase = state.get("relationship_phase", "Discovery")
     delta = float(state.get("last_delta", 1.0))

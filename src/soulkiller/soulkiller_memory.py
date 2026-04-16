@@ -302,7 +302,7 @@ def metrics_to_observations(metrics: list[dict]) -> list[dict]:
             "facet_id": "emotional.emotional_expression",
             "value_position": 0.35,
             "confidence": 0.5,
-            "evidence": (f"Ellipsis at {punc['ellipsis_per_100']:.1f}/100 chars — "
+            "evidence": (f"Ellipsis at {punc['ellipsis_per_100']:.1f}/100 chars - "
                          "trailing/unfinished thoughts suggest internal processing over direct expression."),
             "source_type": "communication_metrics",
             "source_ref": "metrics:punctuation",
@@ -316,7 +316,7 @@ def metrics_to_observations(metrics: list[dict]) -> list[dict]:
             "value_position": 0.3,
             "confidence": 0.55,
             "evidence": (f"{burst['burst_msg_pct']:.0f}% of messages sent in rapid bursts "
-                         f"(avg {burst['avg_burst_size']:.1f} msgs) — "
+                         f"(avg {burst['avg_burst_size']:.1f} msgs) - "
                          "associative/stream-of-consciousness style."),
             "source_type": "communication_metrics",
             "source_ref": "metrics:burst_pattern",

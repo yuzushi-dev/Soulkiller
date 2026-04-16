@@ -84,7 +84,7 @@ async function handleReceived(event: any): Promise<void> {
     ], { detached: true, stdio: 'ignore' });
     cronChild.unref();
 
-    console.log(`[soulkiller-capture] Reply captured for exchange ${exchangeId} — triggered ${followupCron}`);
+    console.log(`[soulkiller-capture] Reply captured for exchange ${exchangeId} - triggered ${followupCron}`);
   } catch (err) {
     console.error('[soulkiller-capture] Follow-up trigger failed:', err instanceof Error ? err.message : String(err));
   }

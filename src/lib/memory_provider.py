@@ -1,4 +1,4 @@
-"""MemoryProvider — pluggable operational memory interface for Soulkiller.
+"""MemoryProvider - pluggable operational memory interface for Soulkiller.
 
 Defines the contract that any memory provider must implement to integrate
 with Soulkiller agents. The default (no-op) provider is NullMemoryProvider.
@@ -9,9 +9,9 @@ use it via the SOULKILLER_MEMORY_PROVIDER env var or runtime config.
 
 Provider registry
 -----------------
-  null        — NullMemoryProvider (built-in, always available)
-  soulkiller  — SoulkillerMemoryProvider (built-in, reads from soulkiller.db)
-  custom      — any importable class path, e.g. "mypackage.MyProvider"
+  null        - NullMemoryProvider (built-in, always available)
+  soulkiller  - SoulkillerMemoryProvider (built-in, reads from soulkiller.db)
+  custom      - any importable class path, e.g. "mypackage.MyProvider"
 
 Usage
 -----
@@ -222,7 +222,7 @@ class NullMemoryProvider:
         return ProviderStatus(
             healthy=True,
             provider_name="null",
-            detail="no-op provider — no memory system configured",
+            detail="no-op provider - no memory system configured",
         )
 
 

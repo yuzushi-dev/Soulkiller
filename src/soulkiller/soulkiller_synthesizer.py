@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Synthesizer — daily consolidation of observations into trait scores.
+"""Soulkiller Synthesizer - daily consolidation of observations into trait scores.
 
 Cron: soulkiller:synthesize, daily at 03:00 Europe/Rome
 
@@ -213,7 +213,7 @@ def compute_trait_status(
     else:
         days_since_last = 999.0
 
-    # Check source_ref diversity (not just source_type — dump_import has many refs)
+    # Check source_ref diversity (not just source_type - dump_import has many refs)
     source_refs = [o.get("source_ref", "") for o in observations]
     unique_refs = len(set(source_refs))
 
@@ -610,7 +610,7 @@ def update_hypotheses(model: str = DEFAULT_MODEL) -> int:
 
         prompt = f"""You are analyzing the personality of a real person (the subject, Italian, 30s, tech worker).
 Given his trait scores, key people/projects in his life, and significant life episodes,
-identify 2-4 cross-facet behavioral hypotheses — patterns that explain *how* and *why* he acts.
+identify 2-4 cross-facet behavioral hypotheses - patterns that explain *how* and *why* he acts.
 
 Good hypotheses connect multiple dimensions: a trait + a context + a person/episode.
 Example: "Under technical stress the subject becomes more impulsive, contradicting his baseline systematic style."

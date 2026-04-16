@@ -1,6 +1,6 @@
 """Tests for /api/amber/* endpoints.
 
-Amber package is optional — tests skip if not installed.
+Amber package is optional - tests skip if not installed.
 The status/items/metrics/trace endpoints degrade gracefully when amber is unavailable.
 """
 from __future__ import annotations

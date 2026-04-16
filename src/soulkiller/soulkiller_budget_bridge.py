@@ -310,7 +310,7 @@ def compute_signals(txns: list[dict], classifications: dict[str, dict]) -> list[
     if installment_txns:
         installment_total = abs(sum(t["_amount"] for t in installment_txns))
         # Using installments suggests short-term planning / cash flow management
-        # Not necessarily negative — could be maximizer behavior
+        # Not necessarily negative - could be maximizer behavior
         signals.append({
             "facet_id": "temporal.planning_horizon",
             "signal_position": 0.4,  # slightly short-term (uses installments)

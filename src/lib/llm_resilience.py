@@ -1,4 +1,4 @@
-"""llm_resilience — resilient LLM call wrapper for Soulkiller OSS.
+"""llm_resilience - resilient LLM call wrapper for Soulkiller OSS.
 
 Wraps ProviderLLMClient with exponential backoff retry logic.
 All soulkiller_* modules that need LLM completions import from here.

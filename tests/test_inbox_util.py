@@ -1,4 +1,4 @@
-"""Tests for soulkiller.inbox — generic inbox.jsonl append utility."""
+"""Tests for soulkiller.inbox - generic inbox.jsonl append utility."""
 import json
 import sys
 from pathlib import Path

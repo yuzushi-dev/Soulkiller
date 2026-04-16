@@ -34,7 +34,7 @@ SOULKILLER_TELEGRAM_ID=123456789
 Numeric Telegram sender ID of the subject. Used by the check-in delivery
 system to route outbound questions to the correct Telegram user. Obtain it
 from your Telegram client or by inspecting a raw message event in OpenClaw.
-Optional — leave blank if you are not using Telegram check-ins.
+Optional - leave blank if you are not using Telegram check-ins.
 
 Note: message filtering in the capture hook is controlled by
 `SOULKILLER_SUBJECT_ID`, not this field. The capture hook matches the
@@ -76,7 +76,7 @@ Path or name of the OpenClaw CLI binary. Override if it is not in `PATH`.
 
 ## Check-in schedule
 
-These variables are informational — they document the schedule the installer
+These variables are informational - they document the schedule the installer
 burned into the cron registration. To change the schedule, re-register the
 cron with a new `--schedule` flag.
 
@@ -174,7 +174,7 @@ SOULKILLER_PROVIDER=anthropic
 ```
 
 The `ProviderLLMClient` stub in `src/lib/provider_llm_client.py` reads these
-values but does not implement the actual call — you must provide an adapter.
+values but does not implement the actual call - you must provide an adapter.
 See [Adapters](ADAPTERS.md) for the implementation contract.
 
 If `SOULKILLER_MODEL` is empty, any cron that calls the LLM raises a clear

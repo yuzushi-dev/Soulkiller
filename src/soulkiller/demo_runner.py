@@ -92,7 +92,7 @@ def _extract_synthetic_observations(messages: list[dict]) -> list[dict]:
                     "signal_strength": strength,
                     "direction": direction,
                     "extracted_at": msg["received_at"],
-                    "source": "[synthetic demo — keyword heuristic]",
+                    "source": "[synthetic demo - keyword heuristic]",
                 })
 
     return observations
@@ -131,7 +131,7 @@ def _generate_profile_md(seed: dict, observations: list[dict]) -> str:
         obs_count[o["facet_id"]] = obs_count.get(o["facet_id"], 0) + 1
 
     lines: list[str] = [
-        "# Soulkiller — Personality Model",
+        "# Soulkiller - Personality Model",
         "",
         f"**Subject**: {seed['subject_name']}",
         f"**Generated**: {datetime.now(timezone.utc).strftime('%Y-%m-%d')}  (synthetic demo run)",
@@ -220,7 +220,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
     )[:4]
 
     lines: list[str] = [
-        "# Portrait — Demo Subject",
+        "# Portrait - Demo Subject",
         "",
         "> *Synthetic demo portrait. In the live system, this document is generated*",
         "> *by the synthesizer from accumulated observations and cross-facet hypotheses.*",
@@ -252,7 +252,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
         ),
         "relational.help_seeking": (
             "Help is sought as a last resort, not a first step. "
-            "The subject typically exhausts independent problem-solving before engaging others — "
+            "The subject typically exhausts independent problem-solving before engaging others - "
             "and often finds partial answers in the process. The pattern is functional but occasionally delays "
             "access to perspectives that would accelerate resolution."
         ),
@@ -267,7 +267,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
             "The subject does not appear to distinguish strongly between professional and personal trust mechanisms."
         ),
         "emotional.stress_response": (
-            "Stress is typically managed through externalization — writing down what's active, "
+            "Stress is typically managed through externalization - writing down what's active, "
             "resetting the cognitive frame, and returning with a reduced load. "
             "The subject shows regulated rather than reactive patterns under observable pressure."
         ),
@@ -281,7 +281,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
         ),
         "meta_cognition.self_awareness": (
             "Self-monitoring is active. The subject notices behavioral patterns in themselves "
-            "(including avoidance — demo-015) and names them explicitly rather than rationalizing. "
+            "(including avoidance - demo-015) and names them explicitly rather than rationalizing. "
             "This does not automatically translate to correction, but the detection layer is present."
         ),
     }
@@ -292,7 +292,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
         if not desc:
             continue
         lines += [
-            f"**`{fid}`** — position {f['position']:.2f} · confidence {f['confidence']:.2f}",
+            f"**`{fid}`** - position {f['position']:.2f} · confidence {f['confidence']:.2f}",
             "",
             desc,
             "",
@@ -324,7 +324,7 @@ def _generate_portrait_md(seed: dict, observations: list[dict]) -> str:
     ]
     for o in observations[:6]:
         lines.append(
-            f"- `{o['facet_id']}` — strength {o['signal_strength']:.2f} · "
+            f"- `{o['facet_id']}` - strength {o['signal_strength']:.2f} · "
             f"direction: {o['direction']} · source: {o['message_id']}"
         )
 
@@ -416,7 +416,7 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
             (now_iso, total_obs, round(avg_conf, 3), round(len(seed["facets"]) / 60 * 100, 1)),
         )
 
-        # inbox — messages as processed
+        # inbox - messages as processed
         for o in seed_obs:
             mid = o.get("message_id", "")
             if mid:
@@ -545,11 +545,11 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
         demo_checkins = [
             ("cognitive.decision_speed",
              "When you make a decision under time pressure, what does your internal process look like?",
-             "I slow down, actually. The pressure makes me more deliberate, not less — I need to understand the tradeoffs before I can commit. I've gotten faster over the years but I don't think I'll ever be someone who decides by gut alone.",
+             "I slow down, actually. The pressure makes me more deliberate, not less - I need to understand the tradeoffs before I can commit. I've gotten faster over the years but I don't think I'll ever be someone who decides by gut alone.",
              4),
             ("relational.help_seeking",
              "How do you typically approach a problem you haven't seen before?",
-             "I try to solve it myself first. Not because I don't want help — I just find I learn more by struggling through it. I'll usually hit a real wall before I ask anyone, and by then I have a much clearer question.",
+             "I try to solve it myself first. Not because I don't want help - I just find I learn more by struggling through it. I'll usually hit a real wall before I ask anyone, and by then I have a much clearer question.",
              3),
             ("communication.feedback_preference",
              "When someone gives you feedback on your work, what format is most useful to you?",
@@ -565,11 +565,11 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
              3),
             ("emotional.stress_response",
              "What do you do when you feel cognitively overloaded?",
-             "I write everything down. Seriously — I get all the active threads out of my head and onto paper. It doesn't solve anything but it frees up enough space to actually think. Then I pick one thing and start.",
+             "I write everything down. Seriously - I get all the active threads out of my head and onto paper. It doesn't solve anything but it frees up enough space to actually think. Then I pick one thing and start.",
              4),
             ("meta_cognition.self_awareness",
              "Is there a pattern in your behavior that you notice but find hard to change?",
-             "Avoidance on difficult conversations. I know when I need to have one, I'm usually aware I'm avoiding it, and I still let it drift for longer than I should. It's not fear exactly — more like I keep waiting for the right moment.",
+             "Avoidance on difficult conversations. I know when I need to have one, I'm usually aware I'm avoiding it, and I still let it drift for longer than I should. It's not fear exactly - more like I keep waiting for the right moment.",
              3),
         ]
         base_time = datetime.now(timezone.utc) - timedelta(days=len(demo_checkins) * 2)
@@ -658,7 +658,7 @@ def _write_demo_db(output_dir: Path, seed: dict, observations: list[dict]) -> No
                 0.58, 0.70, 0.65,
                 json.dumps([
                     "Describes emotional states analytically rather than experientially",
-                    "Avoids 'difficult conversations' — acknowledged explicitly in check-in",
+                    "Avoids 'difficult conversations' - acknowledged explicitly in check-in",
                     "Rare use of first-person affect language in transcripts",
                 ]),
                 json.dumps(["conflict situations", "relational friction", "vulnerability requests"]),
@@ -815,7 +815,7 @@ def run_demo(output_dir: Path) -> dict:
         json.dumps({
             "channel": "demo",
             "status": "not-sent",
-            "note": "Synthetic demo run — no live channel connected.",
+            "note": "Synthetic demo run - no live channel connected.",
         }, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )

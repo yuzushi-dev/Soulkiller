@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Soulkiller LIWC — Analisi psicolinguistica sul corpus inbox.
+"""Soulkiller LIWC - Analisi psicolinguistica sul corpus inbox.
 
 Calcola per ogni settimana (YYYY-WW) i marker linguistici dei messaggi di the subject.
-Nessuna chiamata LLM — tutto regex + word lists italiane.
+Nessuna chiamata LLM - tutto regex + word lists italiane.
 
 Cron: soulkiller:liwc, settimanale domenica 03:00 Europe/Rome
 

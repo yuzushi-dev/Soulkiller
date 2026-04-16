@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Defense Mechanism Detector — Vaillant Hierarchy.
+"""Soulkiller Defense Mechanism Detector - Vaillant Hierarchy.
 
 Analizza il corpus di messaggi/episodi per rilevare i meccanismi di difesa
 secondo la gerarchia di Vaillant (mature, neurotic, immature).
@@ -34,7 +34,7 @@ SAMPLE_MESSAGES = 60
 DEFENSE_PROMPT = """You are a clinical psychologist applying Vaillant's defense mechanism hierarchy.
 Analyze the subject's messages (Italian, 30s, tech worker) to identify which defenses are active.
 
-Vaillant's hierarchy — look for these patterns:
+Vaillant's hierarchy - look for these patterns:
 
 MATURE (adaptive, healthy):
 - sublimation: channels distress into productive/creative work
@@ -64,7 +64,7 @@ Messages (last {n} from the subject):
 Recent episodes context:
 {episodes}
 
-Return a JSON array — only defenses with clear behavioral evidence:
+Return a JSON array - only defenses with clear behavioral evidence:
 [
   {{
     "defense_name": "intellectualization",

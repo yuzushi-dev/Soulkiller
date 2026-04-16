@@ -28,7 +28,7 @@ except ImportError:
 
 pytestmark = pytest.mark.skipif(
     not amber_available,
-    reason="amber package not available — skipping integration tests",
+    reason="amber package not available - skipping integration tests",
 )
 
 

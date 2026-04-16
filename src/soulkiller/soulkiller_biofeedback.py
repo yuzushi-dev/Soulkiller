@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Soulkiller Biofeedback Ingestion — Amazfit Helio Ring via Zepp API.
+"""Soulkiller Biofeedback Ingestion - Amazfit Helio Ring via Zepp API.
 
 Pulls nightly health data (sleep stages, HRV, RHR, stress, SpO2, PAI) and
 converts readings into soulkiller personality observations (IMP-20–28).
@@ -354,24 +354,24 @@ def derive_observations(db: sqlite3.Connection, date_str: str,
         if stype == "hrv_rmssd":
             pos = _clamp((value - HRV_LOW) / (HRV_HIGH - HRV_LOW) * 2 - 1)
             strength = 0.78
-            content = f"HRV RMSSD={value:.1f}ms ({date_str}) — biofeedback"
+            content = f"HRV RMSSD={value:.1f}ms ({date_str}) - biofeedback"
         elif stype == "sleep_deep_pct":
             pos = _clamp((value - 10) / 20 * 2 - 1)
             strength = 0.72
-            content = f"Deep sleep {value:.1f}% ({date_str}) — biofeedback"
+            content = f"Deep sleep {value:.1f}% ({date_str}) - biofeedback"
         elif stype == "sleep_rem_pct":
             pos = _clamp((value - 10) / 20 * 2 - 1)
             strength = 0.72
-            content = f"REM sleep {value:.1f}% ({date_str}) — biofeedback"
+            content = f"REM sleep {value:.1f}% ({date_str}) - biofeedback"
         elif stype == "pai_score":
             pos = _clamp((value - 50) / 50)
             strength = 0.65
-            content = f"PAI score={value:.0f} ({date_str}) — biofeedback"
+            content = f"PAI score={value:.0f} ({date_str}) - biofeedback"
         elif stype == "stress_avg":
             # high stress → low impulsivity regulation (negative pole)
             pos = _clamp((STRESS_HIGH - value) / (STRESS_HIGH - STRESS_LOW) * 2 - 1)
             strength = 0.68
-            content = f"Avg stress={value:.0f} ({date_str}) — biofeedback"
+            content = f"Avg stress={value:.0f} ({date_str}) - biofeedback"
         elif stype == "sleep_onset_ts":
             # proximity to 23:00 local = more structured chronotype
             # wrap 00:00-05:59 → 24-29 so midnight-crossers aren't penalised
@@ -383,86 +383,86 @@ def derive_observations(db: sqlite3.Connection, date_str: str,
             pos = _clamp(1.0 - deviation / 3.0)
             strength = 0.60
             content = (f"Sleep onset {datetime.fromtimestamp(value).strftime('%H:%M')}"
-                       f" ({date_str}) — biofeedback")
+                       f" ({date_str}) - biofeedback")
         elif stype == "sleep_score":
             # Zepp sleep score 0-100; ≥80 = good recovery
             pos = _clamp((value - 50) / 40)
             strength = 0.65
-            content = f"Sleep score={value:.0f}/100 ({date_str}) — biofeedback"
+            content = f"Sleep score={value:.0f}/100 ({date_str}) - biofeedback"
         # ── Fase 1 expansion ─────────────────────────────────────────────────
         elif stype == "sleep_rr":
             # RR notturna: 15 breaths/min = normale; bassa = calma, alta = stress/apnea
             # polo positivo = bassa RR (calmo), polo negativo = alta RR (stress)
             pos = _clamp((15.0 - value) / 5.0)
             strength = 0.65
-            content = f"Sleep respiratory rate={value:.1f} br/min ({date_str}) — biofeedback"
+            content = f"Sleep respiratory rate={value:.1f} br/min ({date_str}) - biofeedback"
         elif stype == "sleep_stages_efficiency":
             # efficienza sonno 0-100%: ≥85% = buona, <70% = problematica
             pos = _clamp((value - 75.0) / 15.0)
             strength = 0.70
-            content = f"Sleep efficiency (GB)={value:.1f}% ({date_str}) — biofeedback"
+            content = f"Sleep efficiency (GB)={value:.1f}% ({date_str}) - biofeedback"
         # ── Computed signals ──────────────────────────────────────────────────
         elif stype == "sleep_efficiency":
             # identica logica a sleep_stages_efficiency
             pos = _clamp((value - 75.0) / 15.0)
             strength = 0.68
-            content = f"Sleep efficiency={value:.1f}% ({date_str}) — computed"
+            content = f"Sleep efficiency={value:.1f}% ({date_str}) - computed"
         elif stype == "circadian_regularity":
             # score 0-1: 1 = perfettamente regolare, 0 = caotico
             pos = _clamp(value * 2.0 - 1.0)
             strength = 0.65
-            content = f"Circadian regularity={value:.3f} ({date_str}) — computed"
+            content = f"Circadian regularity={value:.3f} ({date_str}) - computed"
         elif stype == "recovery_score":
             # ratio rispetto al baseline: +0.4 = +40% HRV vs baseline (ottima)
             # -0.4 = -40% (scarsa); range tipico [-0.5, +0.5]
             pos = _clamp(value / 0.4)
             strength = 0.72
-            content = f"HRV recovery score={value:+.3f} vs baseline ({date_str}) — computed"
+            content = f"HRV recovery score={value:+.3f} vs baseline ({date_str}) - computed"
         elif stype == "hr_reactivity":
             # std HR diurna in bpm; bassa (<8) = molto stabile, alta (>20) = molto reattivo
             # polo positivo = alta reattività (espressivo), polo negativo = piatto (contenuto)
             pos = _clamp((value - 12.0) / 8.0)
             strength = 0.60
-            content = f"HR reactivity (std)={value:.1f} bpm ({date_str}) — computed"
+            content = f"HR reactivity (std)={value:.1f} bpm ({date_str}) - computed"
         elif stype == "activity_consistency":
             # score 0-1: 1 = PAI costante, 0 = PAI molto variabile
             pos = _clamp(value * 2.0 - 1.0)
             strength = 0.60
-            content = f"Activity consistency={value:.3f} ({date_str}) — computed"
+            content = f"Activity consistency={value:.3f} ({date_str}) - computed"
         # ── Sprint 2+3: Muse 2 EEG ───────────────────────────────────────────
         elif stype == "eeg_focus_score":
             # 0-100; 50=neutral → 0.0; 100=high focus → +1.0
             pos = _clamp((value - 50.0) / 50.0)
             strength = 0.72
-            content = f"EEG focus score={value:.1f}/100 ({date_str}) — muse"
+            content = f"EEG focus score={value:.1f}/100 ({date_str}) - muse"
         elif stype == "eeg_calm_score":
             pos = _clamp((value - 50.0) / 50.0)
             strength = 0.70
-            content = f"EEG calm score={value:.1f}/100 ({date_str}) — muse"
+            content = f"EEG calm score={value:.1f}/100 ({date_str}) - muse"
         elif stype == "eeg_theta_beta_ratio":
             # low ratio = decisive/fast; neutral ≈ 2.0; high = cognitive load
             pos = _clamp((2.0 - value) / 1.5)
             strength = 0.65
-            content = f"EEG theta/beta ratio={value:.2f} ({date_str}) — muse"
+            content = f"EEG theta/beta ratio={value:.2f} ({date_str}) - muse"
         elif stype == "eeg_frontal_asymmetry":
             # log ratio: ±0.3 typical range → maps to ±1.0
             pos = _clamp(value / 0.3)
             strength = 0.70
-            content = f"EEG frontal asymmetry={value:+.3f} ({date_str}) — muse"
+            content = f"EEG frontal asymmetry={value:+.3f} ({date_str}) - muse"
         elif stype == "eeg_engagement":
             # engagement index; neutral=1.0; range 0-3
             pos = _clamp((value - 1.0) / 1.0)
             strength = 0.65
-            content = f"EEG engagement index={value:.2f} ({date_str}) — muse"
+            content = f"EEG engagement index={value:.2f} ({date_str}) - muse"
         elif stype == "eeg_alpha_variability":
             # std of alpha 0-0.2; low=stable, moderate(0.05-0.15)=reflective
             pos = _clamp((value - 0.05) / 0.10)
             strength = 0.60
-            content = f"EEG alpha variability={value:.3f} ({date_str}) — muse"
+            content = f"EEG alpha variability={value:.3f} ({date_str}) - muse"
         elif stype == "eeg_meditation_depth":
             pos = _clamp((value - 50.0) / 50.0)
             strength = 0.68
-            content = f"EEG meditation depth={value:.1f}/100 ({date_str}) — muse"
+            content = f"EEG meditation depth={value:.1f}/100 ({date_str}) - muse"
         else:
             continue
 
@@ -675,7 +675,7 @@ def run(date_str: str, dry_run: bool = False) -> None:
             signals["rhr"] = (pai["rhr_from_pai"], "bpm", {})
         info(SCRIPT, f"PAI={pai['pai_score']}")
 
-    # HRV: specific to Helio Ring — endpoint may not exist, we try anyway
+    # HRV: specific to Helio Ring - endpoint may not exist, we try anyway
     hrv_events = pull_events("hrv", date_str, app_token, user_id)
     if not hrv_events:
         hrv_events = pull_events("heartRateVariability", date_str, app_token, user_id)

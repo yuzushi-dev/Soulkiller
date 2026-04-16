@@ -1,13 +1,13 @@
-"""ProviderLLMClient — multi-provider LLM adapter for Soulkiller OSS.
+"""ProviderLLMClient - multi-provider LLM adapter for Soulkiller OSS.
 
 Dispatches to the correct provider based on SOULKILLER_PROVIDER (or inferred
 from the model name). Supported providers:
 
-  anthropic   — requires: pip install anthropic  + ANTHROPIC_API_KEY
-  openai      — requires: pip install openai     + OPENAI_API_KEY
-  ollama      — no extra deps (stdlib urllib)    + Ollama running locally
-  openclaw    — delegates to the openclaw CLI    + OPENCLAW_BIN in PATH
-  openrouter  — uses OpenRouter API (OpenAI-compatible) + OPENROUTER_API_KEY
+  anthropic   - requires: pip install anthropic  + ANTHROPIC_API_KEY
+  openai      - requires: pip install openai     + OPENAI_API_KEY
+  ollama      - no extra deps (stdlib urllib)    + Ollama running locally
+  openclaw    - delegates to the openclaw CLI    + OPENCLAW_BIN in PATH
+  openrouter  - uses OpenRouter API (OpenAI-compatible) + OPENROUTER_API_KEY
 
 Set in .env:
 
@@ -39,7 +39,7 @@ def _infer_provider(model: str) -> str:
         return "anthropic"
     if m.startswith(("gpt-", "o1-", "o3-", "o4-")):
         return "openai"
-    # Unknown model — default to ollama (works for any model pulled locally)
+    # Unknown model - default to ollama (works for any model pulled locally)
     return "ollama"
 
 

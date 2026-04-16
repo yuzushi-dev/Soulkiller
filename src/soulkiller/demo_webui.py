@@ -132,10 +132,10 @@ def build_demo_console(output_dir: Path, variant: str | None = None) -> str:
     )
     subject_slug = escape(summary["subject_name"]).upper().replace(" ", "-")
 
-    facet_count = escape(str(summary.get("facet_count", "—")))
-    obs_seed = escape(str(summary.get("observation_count_seed", "—")))
-    obs_demo = escape(str(summary.get("observation_count_demo_pass", "—")))
-    hypothesis_count = escape(str(summary.get("hypothesis_count", "—")))
+    facet_count = escape(str(summary.get("facet_count", "-")))
+    obs_seed = escape(str(summary.get("observation_count_seed", "-")))
+    obs_demo = escape(str(summary.get("observation_count_demo_pass", "-")))
+    hypothesis_count = escape(str(summary.get("hypothesis_count", "-")))
 
     high_conf_rows = "".join(
         f'<tr>'
@@ -662,14 +662,14 @@ def build_demo_console(output_dir: Path, variant: str | None = None) -> str:
             <h1>{escape(summary["subject_name"])}</h1>
             <div class="lede">
               Public-facing synthetic console generated from demo artifacts only.
-              This view is isolated from the private Soulkiller runtime — no live databases, schedulers, or personal logs are accessed. The soul map below is entirely synthetic.
+              This view is isolated from the private Soulkiller runtime - no live databases, schedulers, or personal logs are accessed. The soul map below is entirely synthetic.
             </div>
             <div class="hero-quote">{escape(theme["hero_quote"])}</div>
           </div>
           <aside class="hero-side">
             <div class="eyebrow">SOUL MAP · SNAPSHOT</div>
             <div class="lead-copy" style="margin-top:12px">
-              {escape(summary["subject_name"])} is represented here through synthetic behavioral traces, facet positions, and stable goal patterns. This is a public showcase artifact — not a live surveillance surface.
+              {escape(summary["subject_name"])} is represented here through synthetic behavioral traces, facet positions, and stable goal patterns. This is a public showcase artifact - not a live surveillance surface.
             </div>
             <div class="token-row" style="margin-top:14px">{variant_tokens}</div>
             <div class="token-row">{top_traits}</div>
@@ -760,7 +760,7 @@ def build_demo_console(output_dir: Path, variant: str | None = None) -> str:
         <article class="card span-12">
           <div class="card-title">Synthetic Delivery Log</div>
           <pre>{escape(delivery_log)}</pre>
-          <div class="footer">荒坂 CORP · SOULKILLER · SECURE YOUR SOUL · Engrammatic transfer demo — no live runtime. Unauthorized access is a capital offense.</div>
+          <div class="footer">荒坂 CORP · SOULKILLER · SECURE YOUR SOUL · Engrammatic transfer demo - no live runtime. Unauthorized access is a capital offense.</div>
         </article>
       </section>
     </main>
