@@ -618,3 +618,60 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+class InspectRequest(BaseModel):
+    subject_id: str = "demo-subject"
+    query_text: str
+    agent_role: str = "assistant"
+    session_context: dict[str, Any] = {}
+    limit: int = 12
+
+
+def _bundle_to_dict(bundle) -> dict:
+    """Serialize a MemoryBundle to a JSON-safe dict."""
+    def items_to_list(items) -> list[dict]:
+        return [
+            {
+                "memory_id": i.memory_id,
+                "memory_type": i.memory_type,
+                "title": i.title,
+                "content": i.content,
+                "origin_type": i.origin_type,
+                "review_status": i.review_status,
+                "confidence": round(i.confidence, 3),
+                "salience": round(i.salience, 3),
+            }
+            for i in items
+        ]
+    return {
+        "constraints":          items_to_list(bundle.constraints),
+        "priorities":           items_to_list(bundle.priorities),
+        "open_loops":           items_to_list(bundle.open_loops),
+        "recent_decisions":     items_to_list(bundle.recent_decisions),
+        "relationship_context": items_to_list(bundle.relationship_context),
+        "contradictions":       items_to_list(bundle.contradictions),
+        "interaction_rules":    items_to_list(bundle.interaction_rules),
+        "session_relevant":     items_to_list(bundle.session_relevant),
+        "trace":                bundle.trace,
+    }
+
+
+@app.post("/api/memory/provider/inspect")
+def api_memory_provider_inspect(body: InspectRequest) -> dict:
+    try:
+        provider = _load_provider()
+    except Exception:
+        from lib.memory_provider import NullMemoryProvider
+        provider = NullMemoryProvider()
+    try:
+        bundle = provider.get_operational_memory(
+            subject_id=body.subject_id,
+            query_text=body.query_text,
+            agent_role=body.agent_role,
+            session_context=body.session_context,
+            limit=body.limit,
+        )
+        return _bundle_to_dict(bundle)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
