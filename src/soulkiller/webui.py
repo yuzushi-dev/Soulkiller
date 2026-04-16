@@ -608,6 +608,384 @@ def api_memory_provider_status() -> dict:
         return {"provider": "error", "healthy": False, "detail": str(exc)}
 
 
+# ── Amber ─────────────────────────────────────────────────────────────────────
+
+def _amber_db():
+    """Return an initialized AmberDB or None if amber is unavailable.
+
+    Requires AMBER_DATA_DIR env var to be set.
+    Returns None gracefully if not set or amber package not installed.
+    """
+    data_dir = _os.environ.get("AMBER_DATA_DIR", "")
+    if not data_dir:
+        return None
+    try:
+        import sys as _sys
+        try:
+            from amber.db import AmberDB
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.db import AmberDB
+        db = AmberDB(db_path=Path(data_dir) / "amber-operational.sqlite")
+        db.initialize()
+        return db
+    except Exception:
+        return None
+
+
+@app.get("/api/amber/status")
+def api_amber_status() -> dict:
+    db = _amber_db()
+    if db is None:
+        return {"available": False, "healthy": False, "detail": "amber not configured (set AMBER_DATA_DIR)"}
+    try:
+        import sys as _sys
+        try:
+            from amber.provider import AmberMemoryProvider
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.provider import AmberMemoryProvider
+        provider = AmberMemoryProvider(db=db)
+        status = provider.health_check()
+        row = db.conn.execute(
+            "SELECT COUNT(*) as n FROM operational_memory_items WHERE status='active'"
+        ).fetchone()
+        active_items = dict(row)["n"] if row else 0
+        return {
+            "available": True,
+            "healthy": status.healthy,
+            "detail": status.detail,
+            "active_items": active_items,
+        }
+    except Exception as exc:
+        return {"available": True, "healthy": False, "detail": str(exc)}
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/items")
+def api_amber_items(
+    subject_id: str = "",
+    review_status: str = "",
+    memory_type: str = "",
+    limit: int = 100,
+) -> list[dict]:
+    db = _amber_db()
+    if db is None:
+        return []
+    try:
+        conditions: list[str] = ["status = 'active'"]
+        params: list[Any] = []
+        if subject_id:
+            conditions.append("subject_id = ?")
+            params.append(subject_id)
+        if review_status:
+            conditions.append("review_status = ?")
+            params.append(review_status)
+        if memory_type:
+            conditions.append("memory_type = ?")
+            params.append(memory_type)
+        rows = db.conn.execute(
+            f"""
+            SELECT id, subject_id, memory_type, title, content,
+                   origin_type, review_status, confidence, salience,
+                   last_seen_at, created_at
+            FROM operational_memory_items
+            WHERE {" AND ".join(conditions)}
+            ORDER BY confidence DESC, last_seen_at DESC
+            LIMIT ?
+            """,
+            (*params, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/metrics")
+def api_amber_metrics(subject_id: str = "demo-subject") -> dict:
+    db = _amber_db()
+    if db is None:
+        return {}
+    try:
+        import sys as _sys
+        try:
+            from amber.metrics import QualityMetrics
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.metrics import QualityMetrics
+        return QualityMetrics(db).compute(subject_id)
+    except Exception:
+        return {}
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/trace")
+def api_amber_trace(subject_id: str = "", limit: int = 20) -> list[dict]:
+    db = _amber_db()
+    if db is None:
+        return []
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+        if subject_id:
+            conditions.append("subject_id = ?")
+            params.append(subject_id)
+        where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+        rows = db.conn.execute(
+            f"""
+            SELECT id, subject_id, query_text, agent_role,
+                   selected_memory_ids_json, retrieval_summary_json, created_at
+            FROM memory_retrieval_logs
+            {where}
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (*params, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
+    finally:
+        db.close()
+
+
+_VALID_REVIEW_ACTIONS = frozenset(
+    {"confirm", "correct", "reject", "expire", "downgrade_confidence", "supersede"}
+)
+
+
+class AmberReviewRequest(BaseModel):
+    action: str
+    note: str = ""
+
+
+@app.post("/api/amber/items/{memory_id}/review")
+def api_amber_review(memory_id: str, body: AmberReviewRequest) -> dict:
+    if body.action not in _VALID_REVIEW_ACTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid action. Must be one of: {sorted(_VALID_REVIEW_ACTIONS)}",
+        )
+    db = _amber_db()
+    if db is None:
+        raise HTTPException(status_code=503, detail="amber not configured (set AMBER_DATA_DIR)")
+    try:
+        row = db.conn.execute(
+            "SELECT id FROM operational_memory_items WHERE id = ?", (memory_id,)
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="memory item not found")
+        import sys as _sys
+        try:
+            from amber.provider import AmberMemoryProvider
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.provider import AmberMemoryProvider
+        AmberMemoryProvider(db=db).review_memory_item(memory_id, body.action, body.note)
+        return {"ok": True, "memory_id": memory_id, "action": body.action}
+    finally:
+        db.close()
+
+
+# ── Amber ─────────────────────────────────────────────────────────────────────
+
+def _amber_db():
+    """Return an initialized AmberDB or None if amber is unavailable.
+
+    Requires AMBER_DATA_DIR env var to be set.
+    Returns None gracefully if not set or amber package not installed.
+    """
+    data_dir = _os.environ.get("AMBER_DATA_DIR", "")
+    if not data_dir:
+        return None
+    try:
+        import sys as _sys
+        try:
+            from amber.db import AmberDB
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.db import AmberDB
+        db = AmberDB(db_path=Path(data_dir) / "amber-operational.sqlite")
+        db.initialize()
+        return db
+    except Exception:
+        return None
+
+
+@app.get("/api/amber/status")
+def api_amber_status() -> dict:
+    db = _amber_db()
+    if db is None:
+        return {"available": False, "healthy": False, "detail": "amber not configured (set AMBER_DATA_DIR)"}
+    try:
+        import sys as _sys
+        try:
+            from amber.provider import AmberMemoryProvider
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.provider import AmberMemoryProvider
+        provider = AmberMemoryProvider(db=db)
+        status = provider.health_check()
+        row = db.conn.execute(
+            "SELECT COUNT(*) as n FROM operational_memory_items WHERE status='active'"
+        ).fetchone()
+        active_items = dict(row)["n"] if row else 0
+        return {
+            "available": True,
+            "healthy": status.healthy,
+            "detail": status.detail,
+            "active_items": active_items,
+        }
+    except Exception as exc:
+        return {"available": True, "healthy": False, "detail": str(exc)}
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/items")
+def api_amber_items(
+    subject_id: str = "",
+    review_status: str = "",
+    memory_type: str = "",
+    limit: int = 100,
+) -> list[dict]:
+    db = _amber_db()
+    if db is None:
+        return []
+    try:
+        conditions: list[str] = ["status = 'active'"]
+        params: list[Any] = []
+        if subject_id:
+            conditions.append("subject_id = ?")
+            params.append(subject_id)
+        if review_status:
+            conditions.append("review_status = ?")
+            params.append(review_status)
+        if memory_type:
+            conditions.append("memory_type = ?")
+            params.append(memory_type)
+        rows = db.conn.execute(
+            f"""
+            SELECT id, subject_id, memory_type, title, content,
+                   origin_type, review_status, confidence, salience,
+                   last_seen_at, created_at
+            FROM operational_memory_items
+            WHERE {" AND ".join(conditions)}
+            ORDER BY confidence DESC, last_seen_at DESC
+            LIMIT ?
+            """,
+            (*params, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/metrics")
+def api_amber_metrics(subject_id: str = "demo-subject") -> dict:
+    db = _amber_db()
+    if db is None:
+        return {}
+    try:
+        import sys as _sys
+        try:
+            from amber.metrics import QualityMetrics
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.metrics import QualityMetrics
+        return QualityMetrics(db).compute(subject_id)
+    except Exception:
+        return {}
+    finally:
+        db.close()
+
+
+@app.get("/api/amber/trace")
+def api_amber_trace(subject_id: str = "", limit: int = 20) -> list[dict]:
+    db = _amber_db()
+    if db is None:
+        return []
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+        if subject_id:
+            conditions.append("subject_id = ?")
+            params.append(subject_id)
+        where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+        rows = db.conn.execute(
+            f"""
+            SELECT id, subject_id, query_text, agent_role,
+                   selected_memory_ids_json, retrieval_summary_json, created_at
+            FROM memory_retrieval_logs
+            {where}
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (*params, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
+    finally:
+        db.close()
+
+
+_VALID_REVIEW_ACTIONS = frozenset(
+    {"confirm", "correct", "reject", "expire", "downgrade_confidence", "supersede"}
+)
+
+
+class AmberReviewRequest(BaseModel):
+    action: str
+    note: str = ""
+
+
+@app.post("/api/amber/items/{memory_id}/review")
+def api_amber_review(memory_id: str, body: AmberReviewRequest) -> dict:
+    if body.action not in _VALID_REVIEW_ACTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid action. Must be one of: {sorted(_VALID_REVIEW_ACTIONS)}",
+        )
+    db = _amber_db()
+    if db is None:
+        raise HTTPException(status_code=503, detail="amber not configured (set AMBER_DATA_DIR)")
+    try:
+        row = db.conn.execute(
+            "SELECT id FROM operational_memory_items WHERE id = ?", (memory_id,)
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="memory item not found")
+        import sys as _sys
+        try:
+            from amber.provider import AmberMemoryProvider
+        except ImportError:
+            _amber_root = Path(__file__).resolve().parents[3] / "Amber-Soulkiller"
+            if _amber_root.exists() and str(_amber_root) not in _sys.path:
+                _sys.path.insert(0, str(_amber_root))
+            from amber.provider import AmberMemoryProvider
+        AmberMemoryProvider(db=db).review_memory_item(memory_id, body.action, body.note)
+        return {"ok": True, "memory_id": memory_id, "action": body.action}
+    finally:
+        db.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Soulkiller Web UI")
     parser.add_argument("--port", type=int, default=8765)
