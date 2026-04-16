@@ -671,6 +671,12 @@
         </button>
       </div>
       <div class="nav-group">
+        <div class="nav-label">Operational Memory</div>
+        <button class="nav-item" onclick="show('ctx-inspector', this)">
+          <span class="icon">⬡</span> Context Inspector
+        </button>
+      </div>
+      <div class="nav-group">
         <div class="nav-label">Signals</div>
         <button class="nav-item" onclick="show('checkin', this)">
           <span class="icon">◌</span> Check-ins
@@ -789,6 +795,56 @@
       <h1 class="page-title">Decisions</h1>
       <p class="page-sub">Volition record · tracked choices and consistency index</p>
       <div id="decisions-body"></div>
+    </section>
+
+    <!-- CONTEXT INSPECTOR -->
+    <section id="s-ctx-inspector" class="section">
+      <h1 class="page-title">Memory Context Inspector</h1>
+      <p class="page-sub">Operational memory · debug bundle iniettato agli agenti</p>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Provider</div>
+        <div id="ctx-provider-status">—</div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Inspect Bundle</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:11px;color:var(--muted-fg);display:block;margin-bottom:4px">Query text</label>
+            <input id="ctx-query" type="text" placeholder="current stress level, priorities, …"
+              style="width:100%;background:var(--input);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--foreground);font-family:var(--font);font-size:13px;">
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:11px;color:var(--muted-fg);display:block;margin-bottom:4px">Agent role</label>
+              <select id="ctx-role"
+                style="width:100%;background:var(--input);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--foreground);font-family:var(--font);font-size:13px;">
+                <option value="assistant">assistant</option>
+                <option value="coach">coach</option>
+                <option value="planner">planner</option>
+                <option value="analyst">analyst</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:11px;color:var(--muted-fg);display:block;margin-bottom:4px">Subject ID</label>
+              <input id="ctx-subject" type="text" value="demo-subject"
+                style="width:100%;background:var(--input);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--foreground);font-family:var(--font);font-size:13px;">
+            </div>
+            <div style="flex:1;min-width:60px;max-width:80px">
+              <label style="font-size:11px;color:var(--muted-fg);display:block;margin-bottom:4px">Limit</label>
+              <input id="ctx-limit" type="number" value="12" min="1" max="30"
+                style="width:100%;background:var(--input);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--foreground);font-family:var(--font);font-size:13px;">
+            </div>
+          </div>
+          <button onclick="runInspect()"
+            style="align-self:flex-start;background:var(--accent-muted);border:1px solid var(--accent);color:var(--accent-fg);padding:8px 20px;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;">
+            Inspect
+          </button>
+        </div>
+      </div>
+
+      <div id="ctx-bundle-result"></div>
     </section>
 
     <!-- CHECKIN -->
@@ -921,6 +977,16 @@ async function get(url) {
   }
   const r = await fetch(url);
   if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function post(url, body) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || r.statusText); }
   return r.json();
 }
 
@@ -1119,8 +1185,90 @@ function openDecisionModal(id) {
   document.getElementById('edit-modal').style.display = 'flex';
 }
 
+// ── Context Inspector ─────────────────────────────────────────────────────
+async function loadCtxInspector() {
+  const s = await get('/api/memory/provider/status');
+  const provEl = document.getElementById('ctx-provider-status');
+  const cls = s.healthy ? 'badge-success' : 'badge-danger';
+  provEl.innerHTML = `<span class="badge ${cls}">${s.provider}</span>
+    <span style="font-size:12px;color:var(--muted-fg);margin-left:10px">${s.detail || ''}</span>`;
+}
+
+async function runInspect() {
+  const query   = document.getElementById('ctx-query').value.trim();
+  const role    = document.getElementById('ctx-role').value;
+  const subject = document.getElementById('ctx-subject').value.trim() || 'demo-subject';
+  const limit   = parseInt(document.getElementById('ctx-limit').value, 10) || 12;
+  const el      = document.getElementById('ctx-bundle-result');
+  if (!query) { el.innerHTML = '<p style="color:var(--warn);font-size:13px">Inserisci un query text.</p>'; return; }
+  el.innerHTML = '<p style="color:var(--muted-fg);font-size:13px">Caricamento\u2026</p>';
+  try {
+    const bundle = await post('/api/memory/provider/inspect', { subject_id: subject, query_text: query, agent_role: role, session_context: {}, limit });
+    el.innerHTML = renderBundle(bundle);
+  } catch(err) { el.innerHTML = `<p style="color:var(--danger);font-size:13px">Errore: ${err.message}</p>`; }
+}
+
+function renderBundle(bundle) {
+  const LABELS = {
+    constraints:          { label: 'Constraints',          icon: '\u25c8', cls: 'badge-danger'  },
+    priorities:           { label: 'Priorities',           icon: '\u25c9', cls: 'badge-warn'    },
+    open_loops:           { label: 'Open Loops',           icon: '\u25ce', cls: 'badge-accent'  },
+    recent_decisions:     { label: 'Recent Decisions',     icon: '\u25d1', cls: 'badge-blue'    },
+    relationship_context: { label: 'Relationship Context', icon: '\u25cc', cls: 'badge-purple'  },
+    contradictions:       { label: 'Contradictions',       icon: '\u26a1', cls: 'badge-danger'  },
+    interaction_rules:    { label: 'Interaction Rules',    icon: '\u25d0', cls: 'badge-muted'   },
+    session_relevant:     { label: 'Session Relevant',     icon: '\u2b21', cls: 'badge-muted'   },
+  };
+  const keys = Object.keys(LABELS);
+  const totalItems = keys.reduce((n, k) => n + (bundle[k]?.length || 0), 0);
+  if (totalItems === 0) {
+    return emptyState('\u25ce', 'Bundle vuoto', 'Provider null o nessun item sopra soglia confidence');
+  }
+  return keys.map(k => {
+    const items = bundle[k] || [];
+    if (!items.length) return '';
+    const { label, icon, cls } = LABELS[k];
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="card-title">${icon} ${label} <span class="badge ${cls}" style="margin-left:6px">${items.length}</span></div>
+      ${items.map(i => `
+        <div class="mem-card" style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:600;font-size:13px">${i.title}</span>
+            <div style="display:flex;gap:4px;flex-shrink:0">
+              <span class="badge badge-muted">${i.memory_type}</span>
+              <span class="badge badge-muted" style="font-family:var(--font-mono)">${(i.confidence*100).toFixed(0)}%</span>
+              <span class="badge badge-muted">${i.origin_type}</span>
+            </div>
+          </div>
+          <p class="mem-content">${i.content}</p>
+          <div class="mem-meta">id: ${i.memory_id}</div>
+        </div>`).join('')}
+    </div>`;
+  }).join('') + renderTrace(bundle.trace);
+}
+
+function renderTrace(trace) {
+  if (!trace?.length) return '';
+  const top = trace.slice(0, 10);
+  const rows = top.map(t => `
+    <tr>
+      <td class="mono">${t.memory_id || t.source || '\u2014'}</td>
+      <td>${t.memory_type || t.step || '\u2014'}</td>
+      <td class="mono">${typeof t.score === 'number' ? t.score.toFixed(3) : '\u2014'}</td>
+      <td>${t.review_status || '\u2014'}</td>
+    </tr>`).join('');
+  return `<div class="card" style="margin-top:12px">
+    <div class="card-title">Retrieval Trace <span class="badge badge-muted" style="margin-left:6px">${trace.length} candidati</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Type / Step</th><th>Score</th><th>Review</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  </div>`;
+}
+
 function load(id) {
   const map = {
+    'ctx-inspector': loadCtxInspector,
     health: loadHealth, cron: loadCron, profile: loadProfile,
     hypotheses: loadHypotheses, fgs: loadFGS, entities: loadEntities,
     episodes: loadEpisodes, decisions: loadDecisions, checkin: loadCheckin,
