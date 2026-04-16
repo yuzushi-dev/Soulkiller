@@ -675,6 +675,9 @@
         <button class="nav-item" onclick="show('ctx-inspector', this)">
           <span class="icon">⬡</span> Context Inspector
         </button>
+        <button class="nav-item" onclick="show('amber', this)">
+          <span class="icon">◈</span> Amber Memory
+        </button>
       </div>
       <div class="nav-group">
         <div class="nav-label">Signals</div>
@@ -845,6 +848,35 @@
       </div>
 
       <div id="ctx-bundle-result"></div>
+    </section>
+
+    <!-- AMBER OPERATIONAL MEMORY -->
+    <section id="s-amber" class="section">
+      <h1 class="page-title">Amber Operational Memory</h1>
+      <p class="page-sub">Operational memory store · items, quality metrics, retrieval trace</p>
+
+      <div id="amber-status-bar" class="kpi-grid" style="margin-bottom:20px"></div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">Active Items</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="amber-type-filters"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Title</th><th>Type</th><th>Origin</th>
+              <th>Review</th><th>Conf</th><th>Last seen</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="amber-items-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recent Retrievals</div>
+        <div id="amber-trace-body"></div>
+      </div>
     </section>
 
     <!-- CHECKIN -->
@@ -1185,6 +1217,113 @@ function openDecisionModal(id) {
   document.getElementById('edit-modal').style.display = 'flex';
 }
 
+// ── Amber Dashboard ───────────────────────────────────────────────────────
+let amberTypeFilter = '';
+
+async function loadAmber() {
+  const [status, metrics, items, trace] = await Promise.all([
+    get('/api/amber/status'),
+    get('/api/amber/metrics').catch(() => ({})),
+    get('/api/amber/items'),
+    get('/api/amber/trace'),
+  ]);
+  renderAmberStatus(status, metrics);
+  renderAmberItems(items);
+  renderAmberTrace(trace);
+  ts();
+}
+
+function renderAmberStatus(s, m) {
+  const el = document.getElementById('amber-status-bar');
+  if (!s.available) {
+    el.innerHTML = `<div class="alert alert-warn" style="grid-column:1/-1"><span class="alert-icon">\u25ce</span><div>Amber non configurato. Imposta <code>AMBER_DATA_DIR</code> e riavvia il server.</div></div>`;
+    return;
+  }
+  const healthCls = s.healthy ? 'kpi-success' : 'kpi-danger';
+  el.innerHTML = [
+    { val: s.healthy ? 'OK' : 'ERR',       label: 'Status',      cls: healthCls },
+    { val: s.active_items ?? '\u2014',      label: 'Active Items', cls: 'kpi-accent' },
+    { val: m.total_retrievals ?? '\u2014',  label: 'Retrievals',  cls: 'kpi-muted' },
+    { val: m.corrected_ratio != null ? (m.corrected_ratio*100).toFixed(1)+'%' : '\u2014',
+                                           label: 'Corrected',   cls: 'kpi-muted' },
+  ].map(i => `<div class="kpi-card"><div class="kpi-value ${i.cls}">${i.val}</div><div class="kpi-label">${i.label}</div></div>`).join('');
+}
+
+function renderAmberItems(rows) {
+  const types = [...new Set(rows.map(r => r.memory_type))].sort();
+  const filterEl = document.getElementById('amber-type-filters');
+  filterEl.innerHTML = [['','Tutti'],...types.map(t=>[t,t])].map(([v,l])=>
+    `<button class="filter-btn ${amberTypeFilter===v?'active':''}" onclick="setAmberFilter('${v}',this)">${l}</button>`
+  ).join('');
+  window._amberItemsCache = rows;
+  _renderAmberItemsFiltered(rows);
+}
+
+function setAmberFilter(v, btn) {
+  amberTypeFilter = v;
+  document.querySelectorAll('#amber-type-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _renderAmberItemsFiltered(window._amberItemsCache || []);
+}
+
+function _renderAmberItemsFiltered(rows) {
+  const filtered = (amberTypeFilter ? rows.filter(r => r.memory_type === amberTypeFilter) : rows).slice(0, 100);
+  const tbody = document.getElementById('amber-items-body');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted-fg);padding:24px">Nessun item</td></tr>`;
+    return;
+  }
+  const reviewCls = { confirmed:'badge-success', pending:'badge-muted', corrected:'badge-warn', rejected:'badge-danger', expired:'badge-muted' };
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.content}">${r.title}</td>
+      <td><span class="badge badge-muted">${r.memory_type}</span></td>
+      <td><span class="badge badge-blue">${r.origin_type}</span></td>
+      <td><span class="badge ${reviewCls[r.review_status]||'badge-muted'}">${r.review_status}</span></td>
+      <td class="mono">${(r.confidence*100).toFixed(0)}%</td>
+      <td style="color:var(--muted-fg);font-size:12px">${fmtDate(r.last_seen_at)}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn-icon" onclick="amberReview('${r.id}','confirm')" title="Confirm" style="color:var(--success)">\u2713</button>
+          <button class="btn-icon" onclick="amberReview('${r.id}','expire')" title="Expire" style="color:var(--warn)">\u2298</button>
+          <button class="btn-icon" onclick="amberReview('${r.id}','reject')" title="Reject" style="color:var(--danger)">\u2715</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function amberReview(id, action) {
+  try {
+    await post(`/api/amber/items/${id}/review`, { action });
+    loadAmber();
+  } catch(err) { alert('Errore: ' + err.message); }
+}
+
+function renderAmberTrace(rows) {
+  const el = document.getElementById('amber-trace-body');
+  if (!rows.length) {
+    el.innerHTML = emptyState('\u25ce', 'Nessun retrieval', 'I log appaiono dopo la prima chiamata a get_operational_memory');
+    return;
+  }
+  el.innerHTML = rows.slice(0, 10).map(r => {
+    let summary = {};
+    try { summary = JSON.parse(r.retrieval_summary_json || '{}'); } catch {}
+    let ids = [];
+    try { ids = JSON.parse(r.selected_memory_ids_json || '[]'); } catch {}
+    return `<div class="mem-card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:600">${r.query_text?.slice(0,80) || '\u2014'}</span>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <span class="badge badge-muted">${r.agent_role}</span>
+          <span class="badge badge-accent">${ids.length} items</span>
+          <span style="font-size:11px;color:var(--muted-fg)">${fmtDate(r.created_at)}</span>
+        </div>
+      </div>
+      <div class="mem-meta">candidates: ${summary.total_candidates ?? '\u2014'} \u00b7 selected: ${summary.total_selected ?? '\u2014'} \u00b7 subject: ${r.subject_id}</div>
+    </div>`;
+  }).join('');
+}
+
 // ── Context Inspector ─────────────────────────────────────────────────────
 async function loadCtxInspector() {
   const s = await get('/api/memory/provider/status');
@@ -1268,6 +1407,7 @@ function renderTrace(trace) {
 
 function load(id) {
   const map = {
+    amber: loadAmber,
     'ctx-inspector': loadCtxInspector,
     health: loadHealth, cron: loadCron, profile: loadProfile,
     hypotheses: loadHypotheses, fgs: loadFGS, entities: loadEntities,
